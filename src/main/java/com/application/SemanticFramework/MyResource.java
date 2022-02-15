@@ -56,7 +56,7 @@ public class MyResource {
 		String input= jobject.get("text").getAsString();
 		String city="null", country="null", year="null", month="null", day="null", magnitude="5.0";
 		
-		System.out.println(input.startsWith("earthquake located in"));
+		//System.out.println(input.startsWith("earthquake located in"));
 		if(input.startsWith("earthquake located in ")) {
 			String parsed=input;
 			parsed=parsed.replace("earthquake located in ", "");
@@ -187,7 +187,7 @@ public class MyResource {
 									return Response.status(200).entity(response).build();
 								}
 								if(!isInteger(keywordList.get(5)) || keywordList.get(5).toString().length()!=2) { 
-									System.out.println("month3");
+									//System.out.println("month3");
 									response = "Expected 2-digit integer for 'day'. Input should follow the following pattern: "
 											+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
 											+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
@@ -243,11 +243,11 @@ public class MyResource {
 							if(keywordList.size()>6) { 
 								
 							if(isInteger(keywordList.get(4)) && keywordList.get(4).toString().length()==2) {
-								System.out.println("month1");
+								//System.out.println("month1");
 								month = keywordList.get(4);
 								if(!keywordList.get(5).equals("with")) {
 								if(!isInteger(keywordList.get(5)) || keywordList.get(5).toString().length()!=2) { 
-									System.out.println("month3");
+									//System.out.println("month3");
 									response = "Expected 2-digit integer for 'day'. Input should follow the following pattern: "
 											+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
 											+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
@@ -256,6 +256,32 @@ public class MyResource {
 											+ "mentioned above is the following: “earthquake located in Rome, Italy in 2019 03 24 with magnitude greater than 6.0”";
 									return Response.status(200).entity(response).build();
 								}
+								}
+								else {
+									if(keywordList.size()>=10) { 
+										if(keywordList.get(6).equals("magnitude") && keywordList.get(7).equals("greater") && keywordList.get(8).equals("than")) {
+											if(!isDouble(keywordList.get(9)) || !hasOneDecimalPoint(keywordList.get(9))) {
+												response = "Expected double value with one decimal point as 'magnitude'. Input should follow the following pattern: "
+														+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
+														+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+														+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+														+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+														+ "mentioned above is the following: “earthquake located in Rome, Italy in 2019 03 24 with magnitude greater than 6.0”";
+												return Response.status(200).entity(response).build();
+											}
+											
+											magnitude=keywordList.get(9).toString(); 
+										}
+										else {
+											response = "Expected 'with magnitude greater than <value>'. Input should follow the following pattern: "
+													+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
+													+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+													+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+													+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+													+ "mentioned above is the following: “earthquake located in Rome, Italy in 2019 03 24 with magnitude greater than 6.0”";
+											return Response.status(200).entity(response).build();
+										}
+									}
 								}
 								if(isInteger(keywordList.get(5)) && keywordList.get(5).toString().length()==2) {
 									day = keywordList.get(5);
@@ -295,9 +321,25 @@ public class MyResource {
 									}
 								}
 								}
-								
+								else if(keywordList.size()==9) {
+								//System.out.println("month2");
+								if(keywordList.get(4).equals("with") && keywordList.get(5).equals("magnitude") && keywordList.get(6).equals("greater")
+									&& keywordList.get(7).equals("than")) {
+									if(!isDouble(keywordList.get(8)) || !hasOneDecimalPoint(keywordList.get(8))) {
+										response = "Expected double value with one decimal point as 'magnitude'. Input should follow the following pattern: "
+												+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
+												+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+												+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+												+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+												+ "mentioned above is the following: “earthquake located in Rome, Italy in 2019 03 24 with magnitude greater than 6.0”";
+										return Response.status(200).entity(response).build();
+									}
+								magnitude=keywordList.get(8).toString(); 
+							    System.out.println("magnitude"+magnitude);
+								}
+							} //added
 								else if(keywordList.size()>=10) {
-									System.out.println("month2");
+									//System.out.println("month2");
 									if(keywordList.get(5).equals("with") && keywordList.get(6).equals("magnitude") && keywordList.get(7).equals("greater")
 										&& keywordList.get(8).equals("than")) {
 										if(!isDouble(keywordList.get(9)) || !hasOneDecimalPoint(keywordList.get(9))) {
@@ -384,9 +426,9 @@ public class MyResource {
 			
 		}
 		else {
-			System.out.println("1");
+			//System.out.println("1");
 			if(!input.startsWith("earthquake")) {
-				System.out.println("1.1");
+				//System.out.println("1.1");
 				response = "Input should start with 'earthquake' keyword. Input should follow the following pattern: "
 						+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
 						+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
@@ -396,9 +438,9 @@ public class MyResource {
 				return Response.status(200).entity(response).build();
 			}
 			else {
-				System.out.println("2");
+			//	System.out.println("2");
 				if(!input.startsWith("earthquake located in")) {
-					System.out.println("2.1");
+					//System.out.println("2.1");
 					response = "Input should start with 'earthquake located in' phrase. Input should follow the following pattern: "
 							+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
 							+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
@@ -408,7 +450,7 @@ public class MyResource {
 					return Response.status(200).entity(response).build();
 				}
 				else if(!input.startsWith("earthquake located in ")) {
-					System.out.println("2.1");
+					//System.out.println("2.1");
 					response = "Space expected after 'earthquake located in' phrase. Input should follow the following pattern: "
 							+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
 							+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
@@ -419,8 +461,9 @@ public class MyResource {
 				}
 			}
 		} 
-		
-		String path = "C:/Users/mariarousi/eclipse-workspace/SemanticFramework/configuration.json";
+		String localDir = System.getProperty("user.dir");
+
+		String path = localDir+"/SemanticFramework/configuration.json";
 	    BufferedReader bufferedReader = new BufferedReader(new FileReader(path));
 	    JsonElement conf = gson.fromJson(bufferedReader, JsonElement.class);
 	   
@@ -465,11 +508,17 @@ public class MyResource {
 		
 		String events = DataReceiver.eventReceiver(city, country, year, month, day, magnitude, eventSource, eventUsername, eventPassword);
 		JSONArray translatedEvents = new JSONArray(DataTranslator.translateEvents(events));
-		String res = "events: "+translatedEvents;
+		String res = "events: "+translatedEvents+"\n";
 		for (int i=0; i<translatedEvents.length(); i++) {
 			for (int j=0; j<copernicusSources.size(); j++) {
-				res+=DataReceiver.productsReceiver(translatedEvents.getJSONObject(i).getString("timestamp"), translatedEvents.getJSONObject(i).getString("latitude"), 
-						translatedEvents.getJSONObject(i).getString("longitude"), copernicusSources.get(j), copernicusUsername.get(j), copernicusPassword.get(j));
+				if(copernicusSources.get(j).contains("scihub")) {
+					res+="scihub";
+				}
+				else if (copernicusSources.get(j).contains("onda-dias")) {
+					res+="onda-dias";
+				}
+				res+=":"+DataReceiver.productsReceiver(translatedEvents.getJSONObject(i).getString("timestamp"), translatedEvents.getJSONObject(i).getString("latitude"), 
+						translatedEvents.getJSONObject(i).getString("longitude"), copernicusSources.get(j), copernicusUsername.get(j), copernicusPassword.get(j))+"\n";
 			}
 		}
 		

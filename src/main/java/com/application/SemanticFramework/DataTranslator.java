@@ -59,15 +59,17 @@ public class DataTranslator {
 		   ]
 		  */
 		
-		System.out.println("results::"+results);
+		//System.out.println("results::"+results);
 		JsonObject jobject = new Gson().fromJson(results, JsonObject.class);
 
 		JSONArray translatedProducts = new JSONArray ();
 		
 		JSONObject product = new JSONObject ();
 		if(source.equals("dhus")) {
+			if(jobject.getAsJsonObject("feed").has("entry")) {
 			JsonArray entry = jobject.getAsJsonObject("feed").getAsJsonArray("entry");
-			System.out.println("entry:"+entry);
+			//System.out.println("entry:"+entry);
+			
 			for (int i=0; i<entry.size(); i++) {
 			
 				product = new JSONObject();
@@ -86,10 +88,12 @@ public class DataTranslator {
 				}	
 				translatedProducts.put(product);		
 			}
+			}
 		}
 		else {
+			if(jobject.has("value")) {
 			JsonArray entry = jobject.getAsJsonArray("value");
-			System.out.println("entry:"+entry);
+			//System.out.println("entry:"+entry);
 			for (int i=0; i<entry.size(); i++) {
 					
 				product = new JSONObject();
@@ -98,6 +102,7 @@ public class DataTranslator {
 				product.put("date", entry.get(i).getAsJsonObject().get("beginPosition").getAsString());
 				product.put("location", entry.get(i).getAsJsonObject().get("footprint").getAsString());				
 				translatedProducts.put(product);			
+			}
 			}
 		}
 		

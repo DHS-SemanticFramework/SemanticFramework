@@ -33,9 +33,17 @@ public class DataReceiver {
 	public static String eventReceiver(String cityLat, String cityLong, String year, String month, String day, String magnitude, String source, String username, String password) throws IOException {
 		  
 		
-		  System.out.println(year+"-"+  month+"-"+  day +"-"+ magnitude);
-		  cityLat = "37.97945";
+		 // System.out.println(year+"-"+  month+"-"+  day +"-"+ magnitude);
+		  cityLat = "37.97945"; //2019
 		  cityLong= "23.71622";
+		
+		  cityLat = "16.56"; //2021
+		  cityLong= "-60.78";
+
+		  cityLat = "39.776"; //2021
+		  cityLong= "22.08";
+		  cityLat = "-18.76"; //2021 - not working
+		  cityLong= "-176.30";
 		  String date, enddate;
 		  if(month.equals("null")) {
 			date = year+"-01-01";
@@ -80,8 +88,9 @@ public class DataReceiver {
 		  String plus = dateCalculation(eventDate.substring(0, 10), "plus");
 		  ArrayList <String> dataSources = new ArrayList <String> ();
 		  
-		  System.out.println(source);
-		  source=source.replace("[eventLat]", eventLat).replace("[eventLong]", eventLong).replace("[eventStartTime]", minus).replace("[eventEndTime]", plus);
+		  //System.out.println(source);
+		  //source=source.replace("[eventLat]", eventLat).replace("[eventLong]", eventLong).replace("[eventStartTime]", minus).replace("[eventEndTime]", plus);
+		  source=source.replace("[eventLat]", eventLong).replace("[eventLong]", eventLat).replace("[eventStartTime]", minus).replace("[eventEndTime]", plus);
 		  System.out.println(source);
 		  dataSources.add(source);
 		  String result="";
@@ -136,14 +145,14 @@ public class DataReceiver {
 			// subtract 12 Days to Instant 
 			Instant value = inst.minus(Period.ofDays(12)); 
 			// print result 
-			System.out.println("Instant after subtracting Days: " + value); 
+			//System.out.println("Instant after subtracting Days: " + value); 
 			return value.toString().substring(0,10);
 		}
 		if (operation.equals("plus")) {
 			// add 12 Days to Instant 
 			Instant value = inst.plus(Period.ofDays(12)); 
 			// print result 
-			System.out.println("Instant after adding Days: " + value); 
+			//System.out.println("Instant after adding Days: " + value); 
 			return value.toString().substring(0,10);
 		}
 		return "null";

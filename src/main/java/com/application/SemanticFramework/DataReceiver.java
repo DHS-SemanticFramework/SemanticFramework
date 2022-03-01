@@ -5,45 +5,38 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+
 
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.XML;
+import org.json.JSONArray;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class DataReceiver {
 
 	public static String eventReceiver(String cityLat, String cityLong, String year, String month, String day, String magnitude, String source, String username, String password) throws IOException {
 		  
 		
-		 // System.out.println(year+"-"+  month+"-"+  day +"-"+ magnitude);
+		
 		  cityLat = "37.97945"; //2019
 		  cityLong= "23.71622";
 		
 		  cityLat = "16.56"; //2021
 		  cityLong= "-60.78";
 
-		  cityLat = "39.776"; //2021
-		  cityLong= "22.08";
-		  cityLat = "-18.76"; //2021 - not working
-		  cityLong= "-176.30";
+		 // cityLat = "39.776"; //2021
+		 // cityLong= "22.08";
+		 // cityLat = "-18.76"; //2021 - not working
+		 // cityLong= "-176.30";
 		  String date, enddate;
 		  if(month.equals("null")) {
 			date = year+"-01-01";
@@ -79,7 +72,7 @@ public class DataReceiver {
 	      return result.toString();
 		
 	}
-	public static String productsReceiver(String eventDate, String eventLat, String eventLong, String source, String username, String password) throws IOException, UnirestException {
+	public static JSONArray productsReceiver(String eventDate, String eventLat, String eventLong, String source, String username, String password) throws IOException, UnirestException {
 		
 		  /* Configuration file: 
 		   •	sensing date of the data source(s) in the form of yyyy-mm-dd ?
@@ -88,13 +81,12 @@ public class DataReceiver {
 		  String plus = dateCalculation(eventDate.substring(0, 10), "plus");
 		  ArrayList <String> dataSources = new ArrayList <String> ();
 		  
-		  //System.out.println(source);
-		  //source=source.replace("[eventLat]", eventLat).replace("[eventLong]", eventLong).replace("[eventStartTime]", minus).replace("[eventEndTime]", plus);
 		  source=source.replace("[eventLat]", eventLong).replace("[eventLong]", eventLat).replace("[eventStartTime]", minus).replace("[eventEndTime]", plus);
 		  System.out.println(source);
 		  dataSources.add(source);
 		  String result="";
-		  String finalresult ="";
+		  
+		  JSONArray finalresult = new JSONArray();
 
 		  if(!source.contains("onda-dias")) {
 			  result = "";
@@ -118,8 +110,8 @@ public class DataReceiver {
 	             result+=line; 
 	          }
 	          
-	          finalresult+=DataTranslator.translateCopernicusMetadata(result.toString(), "dhus");
-	    
+	          
+	          finalresult=DataTranslator.translateCopernicusMetadata(result.toString(), "dhus");
 		  }
 		  else {
 			  result = "";
@@ -129,11 +121,11 @@ public class DataReceiver {
 			    .asString();
 			  
 			  result+=respon.getBody();
-			  finalresult+=DataTranslator.translateCopernicusMetadata(result.toString(), "onda-dias");
-		  
+			  
+			  finalresult=DataTranslator.translateCopernicusMetadata(result.toString(), "onda-dias");
 		  }
 		  
-		return finalresult.toString();
+		return finalresult;
 			  
 		
 	}

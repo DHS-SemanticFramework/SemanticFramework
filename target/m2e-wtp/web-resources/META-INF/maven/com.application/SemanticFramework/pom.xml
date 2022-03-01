@@ -42,6 +42,12 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+			    <groupId>org.apache.tomcat.maven</groupId>
+			    <artifactId>tomcat7-maven-plugin</artifactId>
+			    <version>2.2</version>
+			</plugin>
+            
         </plugins>
     </build>
     <dependencies>
@@ -102,6 +108,29 @@
     <artifactId>unirest-java</artifactId>
     <version>1.4.9</version>
 </dependency>
+   <dependency>
+    <groupId>org.apache.jena</groupId>
+    <artifactId>apache-jena-libs</artifactId>
+    <type>pom</type>
+    <version>3.1.0</version>
+</dependency>
+
+<!--    <dependency>
+     <groupId>com.openlink.virtuoso</groupId>
+   <artifactId>virtjdbc4</artifactId>
+    <version>4.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/virtjdbc4.jar</systemPath>
+</dependency>
+<dependency>
+   
+   <groupId>com.openlink.virtuoso</groupId>
+   <artifactId>virt_jena3</artifactId>
+    <version>3.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/virt_jena3.jar</systemPath>
+</dependency> -->
+
 
     </dependencies>
     <properties>

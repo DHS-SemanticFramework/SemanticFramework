@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 
 public class DataTranslator {
 	
-	public static String translateEvents (String results) {
+	public static JSONArray translateEvents (String results) {
 		/*Acceptable data schema for events:
 		[ 
 		  {
@@ -42,12 +42,11 @@ public class DataTranslator {
 			translatedEvents.put(translatedEvent);
 			}
 		}
-		return translatedEvents.toString();
+		return translatedEvents;
 	}
 	
-	public static String translateCopernicusMetadata (String results, String source) {
-		
-		
+	public static JSONArray translateCopernicusMetadata (String results, String source) {
+				
 		/*Acceptable data schema for copernicus metadata:
 		 * [
 			  {
@@ -59,7 +58,6 @@ public class DataTranslator {
 		   ]
 		  */
 		
-		//System.out.println("results::"+results);
 		JsonObject jobject = new Gson().fromJson(results, JsonObject.class);
 
 		JSONArray translatedProducts = new JSONArray ();
@@ -68,7 +66,6 @@ public class DataTranslator {
 		if(source.equals("dhus")) {
 			if(jobject.getAsJsonObject("feed").has("entry")) {
 			JsonArray entry = jobject.getAsJsonObject("feed").getAsJsonArray("entry");
-			//System.out.println("entry:"+entry);
 			
 			for (int i=0; i<entry.size(); i++) {
 			
@@ -93,7 +90,7 @@ public class DataTranslator {
 		else {
 			if(jobject.has("value")) {
 			JsonArray entry = jobject.getAsJsonArray("value");
-			//System.out.println("entry:"+entry);
+
 			for (int i=0; i<entry.size(); i++) {
 					
 				product = new JSONObject();
@@ -106,7 +103,7 @@ public class DataTranslator {
 			}
 		}
 		
-		return translatedProducts.toString();
+		return translatedProducts;
 	}
 
 }

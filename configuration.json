@@ -11,9 +11,9 @@
     {
       "DHuSAddress": "scihub.copernicus.eu",
       "dataSource": "https://[DHuSAddress]/dhus/search?q=(platformname:Sentinel-1%20AND%20producttype:SLC%20AND%20sensoroperationalmode:IW%20AND%20footprint:%22Intersects(POINT([eventLat]%20[eventLong]))%22%20AND%20beginposition:[[eventStartTime]T00:00:00.000Z%20TO%20[eventEndTime]T00:00:00.000Z])&format=json",
-      "username": "mariarousi",
+      "username": "XXX",
       "password": "XXX",
-      "type": "XXX",
+      "type": "copernicus",
       "associatedId": "1"
     },
     {

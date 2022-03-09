@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -64,7 +63,7 @@ public class MyResource {
 		JsonObject jobject = json.getAsJsonObject();
 		String input= jobject.get("text").getAsString();
 		String city="null", country="null", year="null", month="null", day="null", magnitude="5.0";
-		
+		String latitude="null", longitude="null";
 		
 		if(input.startsWith("earthquake located in ")) {
 			String parsed=input;
@@ -498,15 +497,157 @@ public class MyResource {
 				}
 			}
 			else {
-				response = "Comma (,) expected after city. Input should follow the following pattern: "
-						+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
-						+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
-						+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
-						+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
-						+ "mentioned above is the following: “earthquake located in Rome, Italy in 2019 03 24 with magnitude greater than 6.0”";
-				JsonObject error = new JsonObject ();
-				error.addProperty("error", response);	
-				return Response.status(200).entity(error.toString()).build();
+				if(!keywordList.get(0).contains("POINT")) {
+					response = "Comma (,) expected after city. Input should follow the following pattern: "
+							+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
+							+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+							+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+							+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+							+ "mentioned above is the following: “earthquake located in Rome, Italy in 2019 03 24 with magnitude greater than 6.0”";
+					JsonObject error = new JsonObject ();
+					error.addProperty("error", response);	
+					return Response.status(200).entity(error.toString()).build();
+				}
+				else {
+					
+					if (keywordList.get(0).contains("POINT")) {
+						System.out.println(keywordList.get(1)+" "+keywordList.get(2)+" "+keywordList.get(3)+" ");
+						 
+						if(!isDouble(keywordList.get(1).replace("(", "")) || !isDouble(keywordList.get(2).replace(")", ""))) {
+							response = "Double numbers expected as latitude longitude after POINT. Input should follow the following pattern: "
+									+"“earthquake located in POINT (<latitude> <longitude>) in <year> <month> <day> with magnitude greater than <magnitude>” . "
+									+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+									+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+									+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+									+ "mentioned above is the following: “earthquake located in POINT (45.0 77.90424715741715) in 2019 03 24 with magnitude greater than 6.0”";
+							JsonObject error = new JsonObject ();
+							error.addProperty("error", response);	
+							return Response.status(200).entity(error.toString()).build();
+						}
+						else {
+							latitude = keywordList.get(1).replace("(", "");
+							longitude = keywordList.get(2).replace(")", "");
+							if(!keywordList.get(3).equals("in")) {
+							response = "Expected 'in' keyword after POINT (latitude longitude). Input should follow the following pattern: "
+									+"“earthquake located in POINT (<latitude> <longitude>) in <year> <month> <day> with magnitude greater than <magnitude>” . "
+									+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+									+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+									+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+									+ "mentioned above is the following: “earthquake located in POINT (45.0 77.90424715741715) in 2019 03 24 with magnitude greater than 6.0”";
+							JsonObject error = new JsonObject ();
+							error.addProperty("error", response);	
+							return Response.status(200).entity(error.toString()).build();
+							}
+							else {
+						
+							if(isInteger(keywordList.get(4)) && keywordList.get(4).toString().length()==4) {
+								
+								year=keywordList.get(4);
+								
+									if(keywordList.size()>5) {
+									if(isInteger(keywordList.get(5)) || keywordList.get(5).toString().length()==2) { 
+										
+										month = keywordList.get(5);
+										if(keywordList.size()>6) {
+										if(isInteger(keywordList.get(6)) && keywordList.get(6).toString().length()==2) { 
+											
+											
+											day = keywordList.get(6);
+											if(keywordList.size()>11) {
+											 if (keywordList.get(7).equals("with")) {
+												
+													if(keywordList.get(8).equals("magnitude") && keywordList.get(9).equals("greater") && keywordList.get(10).equals("than") && isDouble(keywordList.get(keywordList.size()-1)) 
+															&& hasOneDecimalPoint(keywordList.get(keywordList.size()-1))) {
+														
+														magnitude = keywordList.get(keywordList.size()-1);
+														if(Double.parseDouble(magnitude)<5.0) {
+															response = "The value of the magnitude must be at least 5.0.";
+															JsonObject error = new JsonObject ();
+															error.addProperty("error", response);	
+															return Response.status(200).entity(error.toString()).build();
+														}
+													}	
+												}
+											}
+										}
+										else if((isInteger(keywordList.get(6)) && keywordList.get(6).toString().length()!=2) ||
+												(!isInteger(keywordList.get(6)) && keywordList.get(6).toString().length()==2)) {
+											
+											response = "Expected 2-digit integer for 'day'. Input should follow the following pattern: "
+													+"“earthquake located in POINT (<latitude> <longitude>) in <year> <month> <day> with magnitude greater than <magnitude>” . "
+													+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+													+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+													+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+													+ "mentioned above is the following: “earthquake located in POINT (45.0 77.90424715741715) in 2019 03 24 with magnitude greater than 6.0”";
+											JsonObject error = new JsonObject ();
+											error.addProperty("error", response);	
+											return Response.status(200).entity(error.toString()).build();
+										}
+										else if (keywordList.get(6).equals("with")) {
+											if(keywordList.size()>10) {
+												if(keywordList.get(7).equals("magnitude") && keywordList.get(8).equals("greater") && keywordList.get(9).equals("than") && isDouble(keywordList.get(keywordList.size()-1)) 
+														&& hasOneDecimalPoint(keywordList.get(keywordList.size()-1))) {
+													
+													magnitude = keywordList.get(keywordList.size()-1);
+													if(Double.parseDouble(magnitude)<5.0) {
+														response = "The value of the magnitude must be at least 5.0.";
+														JsonObject error = new JsonObject ();
+														error.addProperty("error", response);	
+														return Response.status(200).entity(error.toString()).build();
+													}
+												}
+											}
+										}
+										}
+									}
+									else if(keywordList.get(5).equals("with")) {
+										if(keywordList.size()>9) {
+											if(keywordList.get(6).equals("magnitude") && keywordList.get(7).equals("greater") && keywordList.get(8).equals("than") && isDouble(keywordList.get(keywordList.size()-1)) 
+													&& hasOneDecimalPoint(keywordList.get(keywordList.size()-1))) {
+												
+												magnitude = keywordList.get(keywordList.size()-1);
+												if(Double.parseDouble(magnitude)<5.0) {
+													response = "The value of the magnitude must be at least 5.0.";
+													JsonObject error = new JsonObject ();
+													error.addProperty("error", response);	
+													return Response.status(200).entity(error.toString()).build();
+												}
+											}
+										}
+									}
+									else if((isInteger(keywordList.get(5)) && keywordList.get(5).toString().length()!=2) ||
+											(!isInteger(keywordList.get(5)) && keywordList.get(5).toString().length()==2)) {
+										
+										response = "Expected 2-digit integer for 'month'. Input should follow the following pattern: "
+												+"“earthquake located in POINT (<latitude> <longitude>) in <year> <month> <day> with magnitude greater than <magnitude>” . "
+												+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+												+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+												+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+												+ "mentioned above is the following: “earthquake located in POINT (45.0 77.90424715741715) in 2019 03 24 with magnitude greater than 6.0”";
+										JsonObject error = new JsonObject ();
+										error.addProperty("error", response);	
+										return Response.status(200).entity(error.toString()).build();
+									}
+									}
+						
+									
+							}
+							else {
+								response = "Expected 4-digit integer for 'year'. Input should follow the following pattern: "
+										+"“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
+										+ "It is worth mentioning that month, day and magnitude are optional fields. All keywords are expected in English. "
+										+ "Magnitude is expected as a double value with one decimal place and a point (not a comma) as a decimal separator. "
+										+ "Date is expected in yyyy mm dd format. So for instance, an input example that contains all the parameters "
+										+ "mentioned above is the following: “earthquake located in Rome, Italy in 2019 03 24 with magnitude greater than 6.0”";
+								JsonObject error = new JsonObject ();
+								error.addProperty("error", response);	
+								return Response.status(200).entity(error.toString()).build();
+							
+							}
+							}
+						}
+					}
+				}
 			}
 			}
 			else {
@@ -564,6 +705,12 @@ public class MyResource {
 				}
 			}
 		} 
+		
+		if(latitude.equals("null") && longitude.equals("null")) {
+			// Calling location detection
+			// latitude =
+			// longitude =
+		}
 		String localDir = System.getProperty("user.dir");
 
 		String path ="C:/Users/mariarousi/eclipse-workspace/SemanticFramework/configuration.json";
@@ -613,11 +760,11 @@ public class MyResource {
 	    }
 		String uuid = UUID.randomUUID().toString().replaceAll("-", "");
 
-		String location="POINT (XX)";
-		String events = DataReceiver.eventReceiver(city, country, year, month, day, magnitude, eventSource, eventUsername, eventPassword);
+		String location="POINT ("+latitude+" "+longitude+")";
+		String events = DataReceiver.eventReceiver(latitude, longitude, year, month, day, magnitude, eventSource, eventUsername, eventPassword);
 		
 		JSONArray translatedEvents = DataTranslator.translateEvents(events);
-		String res = "events: "+translatedEvents+"\n";
+		
 		JSONObject result = new JSONObject();
 		Model model = ModelFactory.createDefaultModel();
 		String source="";
@@ -629,17 +776,15 @@ public class MyResource {
 			result.put("event", translatedEvents.get(i));
 			for (int j=0; j<copernicusSources.size(); j++) {
 				if(copernicusSources.get(j).contains("scihub")) {
-					res+="scihub";
-					//source = "scihub";
+					
+					
 					source = copernicusSources.get(j);
 				}
 				else if (copernicusSources.get(j).contains("onda-dias")) {
-					res+="onda-dias";
-					//source="onda-dias";
+					
 					source = copernicusSources.get(j);
 				}
-				//res+=":"+DataReceiver.productsReceiver(translatedEvents.getJSONObject(i).getString("timestamp"), translatedEvents.getJSONObject(i).getString("latitude"), 
-					//	translatedEvents.getJSONObject(i).getString("longitude"), copernicusSources.get(j), copernicusUsername.get(j), copernicusPassword.get(j))+"\n";
+				
 				result.put(source, DataReceiver.productsReceiver(translatedEvents.getJSONObject(i).getString("timestamp"), translatedEvents.getJSONObject(i).getString("latitude"), 
 						translatedEvents.getJSONObject(i).getString("longitude"), copernicusSources.get(j), copernicusUsername.get(j), 
 						copernicusPassword.get(j)));
@@ -649,7 +794,10 @@ public class MyResource {
 		}
 		SemanticRepresentation.storeModel(model, kb_address);
 		
-        return Response.status(200).entity(result.toString()).build();
+		JSONArray results;
+		results=SemanticRetrieval.retrieve(uuid,copernicusSources);
+
+        return Response.status(200).entity(results.toString()).build();
 		}
 		else if(task.equals("population")) {
 			

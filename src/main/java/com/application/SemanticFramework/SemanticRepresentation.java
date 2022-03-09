@@ -15,6 +15,8 @@ import virtuoso.jena.driver.VirtModel;
 
 public class SemanticRepresentation {
 	
+	public static String repository= "http://localhost:8890/SentinelRepo";
+	
 	public static Model eventsInitialization (String events, String uuid, String year, String month, String day, String location, String city, String country) {
 		Model model = ModelFactory.createDefaultModel();
 		model.setNsPrefix("event", Prefixes.event);
@@ -40,8 +42,12 @@ public class SemanticRepresentation {
 		
 		
 		model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"place"), location); // to be added after location detection 
-		model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"city"), city);
-		model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"country"), country);
+		if(!city.equals("null")) {
+			model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"city"), city);
+		}
+		if(!country.equals("null")) {
+			model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"country"), country);
+		}
 		return model;
 	}
 
@@ -59,7 +65,7 @@ public class SemanticRepresentation {
 		model.add(model.createResource(earthquake_instance), model.createProperty(Prefixes.event+"depth"), result.getJSONObject("event").getString("depth"));
 		model.add(model.createResource(earthquake_instance), model.createProperty(Prefixes.event+"latitude"), result.getJSONObject("event").getString("latitude"));
 		model.add(model.createResource(earthquake_instance), model.createProperty(Prefixes.event+"longitude"), result.getJSONObject("event").getString("longitude"));
-		model.add(model.createResource(earthquake_instance), model.createProperty(Prefixes.time+"inXSDDateTimeStamp"), result.getJSONObject("event").getString("timestamp"));
+		model.add(model.createResource(earthquake_instance), model.createProperty(Prefixes.time+"inXSDDateTimeStamp"), result.getJSONObject("event").getString("timestamp").substring(0, result.getJSONObject("event").getString("timestamp").length()-4)+"Z");
 
 		for(int j=0; j<copernicusSources.size(); j++) {
 			for(int i=0; i<result.getJSONArray(copernicusSources.get(j)).length(); i++) {
@@ -77,18 +83,16 @@ public class SemanticRepresentation {
 			}
 		}
 
-		System.out.println(model);
-		
 		return model;
 	}
 	
 	public static void storeModel(Model model, String kb_address) {
 		
-		VirtModel virtualModel = VirtModel.openDatabaseModel("http://localhost:8890/Test21",
-				"jdbc:virtuoso://localhost:1111", "dba", "mysecret"); //this is working with non-docker
+		VirtModel virtualModel = VirtModel.openDatabaseModel(repository,
+				"jdbc:virtuoso://localhost:1111", "dba", "mysecret"); // non-docker
 		
-		//VirtModel virtualModel = VirtModel.openDatabaseModel("http://localhost:8890/Test21",
-			//kb_address, "dba", "mysecret"); //this is working with docker
+		//VirtModel virtualModel = VirtModel.openDatabaseModel(repository,
+			//kb_address, "dba", "mysecret"); // docker
 		
 		//Add model		
 		virtualModel.add(model);

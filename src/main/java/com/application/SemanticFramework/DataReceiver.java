@@ -24,19 +24,18 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 public class DataReceiver {
 
 	public static String eventReceiver(String cityLat, String cityLong, String year, String month, String day, String magnitude, String source, String username, String password) throws IOException {
-		  
-		
-		
-		  cityLat = "37.97945"; //2019
-		  cityLong= "23.71622";
-		
-		  cityLat = "16.56"; //2021
-		  cityLong= "-60.78";
 
-		 // cityLat = "39.776"; //2021
-		 // cityLong= "22.08";
-		 // cityLat = "-18.76"; //2021 - not working
-		 // cityLong= "-176.30";
+		/*  examples:
+		    cityLat = "37.97945"; //2019
+		  	cityLong= "23.71622";
+		
+		    cityLat = "16.56"; //2021
+		    cityLong= "-60.78";
+
+		    cityLat = "39.776"; //2021
+		    cityLong= "22.08";
+		 */
+		
 		  String date, enddate;
 		  if(month.equals("null")) {
 			date = year+"-01-01";
@@ -136,15 +135,13 @@ public class DataReceiver {
 		if (operation.equals("minus")) {
 			// subtract 12 Days to Instant 
 			Instant value = inst.minus(Period.ofDays(12)); 
-			// print result 
-			//System.out.println("Instant after subtracting Days: " + value); 
+			
 			return value.toString().substring(0,10);
 		}
 		if (operation.equals("plus")) {
 			// add 12 Days to Instant 
 			Instant value = inst.plus(Period.ofDays(12)); 
-			// print result 
-			//System.out.println("Instant after adding Days: " + value); 
+			
 			return value.toString().substring(0,10);
 		}
 		return "null";

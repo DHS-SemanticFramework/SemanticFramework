@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+    sf-kb:
+        image: openlink/virtuoso-opensource-7:latest
+        container_name: kb
+        environment:
+            - DBA_PASSWORD=mysecret
+        ports:
+            - '1111:1111'
+            - '8890:8890'
+        volumes:
+            - './pwd:/database'
+    sf-api:
+        image: collaborativedhs/semantic_framework:latest
+        depends_on:
+            - sf-kb
+        ports:
+            - '8087:8080'    
+        volumes:
+            - ./config/configuration.json:/config/configuration.json
+        environment:
+            - 'KB_ADDRESS=jdbc:virtuoso://sf-kb:1111'
+            - 'KB_ADDRESS_RETRIEVE=http://sf-kb:8890/sparql'
+        

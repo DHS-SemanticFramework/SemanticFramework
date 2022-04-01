@@ -15,7 +15,6 @@ import virtuoso.jena.driver.VirtModel;
 
 public class SemanticRepresentation {
 	
-	public static String repository= "http://localhost:8890/SentinelRepo";
 	
 	public static Model eventsInitialization (String events, String uuid, String year, String month, String day, String location, String city, String country) {
 		Model model = ModelFactory.createDefaultModel();
@@ -38,10 +37,10 @@ public class SemanticRepresentation {
 		String formater_output = DATE_TIME_FORMATTER.format( instant );
 		LocalDateTime current_time=  LocalDateTime.parse(formater_output,DATE_TIME_FORMATTER);
 		
-		model.add(model.createResource(event_instance), model.createProperty(Prefixes.time+"inXSDDateTimeStamp"), current_time.toString()); //current timestamp
+		model.add(model.createResource(event_instance), model.createProperty(Prefixes.time+"inXSDDateTimeStamp"), current_time.toString()); 
 		
 		
-		model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"place"), location); // to be added after location detection 
+		model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"place"), location); 
 		if(!city.equals("null")) {
 			model.add(model.createResource(event_instance), model.createProperty(Prefixes.event+"city"), city);
 		}
@@ -86,13 +85,11 @@ public class SemanticRepresentation {
 		return model;
 	}
 	
-	public static void storeModel(Model model, String kb_address) {
+	public static void storeModel(Model model, String kb_address, String repository) {
+		
 		
 		VirtModel virtualModel = VirtModel.openDatabaseModel(repository,
-				"jdbc:virtuoso://localhost:1111", "dba", "mysecret"); // non-docker
-		
-		//VirtModel virtualModel = VirtModel.openDatabaseModel(repository,
-			//kb_address, "dba", "mysecret"); // docker
+			kb_address, "dba", "mysecret"); 
 		
 		//Add model		
 		virtualModel.add(model);

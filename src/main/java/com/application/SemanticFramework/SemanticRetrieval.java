@@ -11,12 +11,11 @@ import org.json.JSONObject;
 
 public class SemanticRetrieval {
 
-    public static JSONArray retrieve(String uuid, ArrayList < String > copernicusSources) {
+    public static JSONArray retrieve(String uuid, ArrayList < String > copernicusSources, String service) {
 
         JSONArray events = new JSONArray();
         JSONObject event = new JSONObject();
-        String service = "http://localhost:8890/sparql"; // non-docker
-        //service ="http://172.17.0.2:8890/sparql"; //docker
+  
         String query ;
 
         query = "prefix event:<http://purl.org/NET/c4dm/event.owl#>\r\n" +
@@ -25,8 +24,7 @@ public class SemanticRetrieval {
             "prefix xsd:<http://www.w3.org/2001/XMLSchema#>\r\n" +
             "\r\n" +
             "select * " +
-            //"FROM <http://localhost:8890/Test21> \r\n" +
-            "FROM <"+SemanticRepresentation.repository+"> \r\n"+
+            "FROM <"+MyResource.repository+"> \r\n"+
             "where {" +
             "?event rdf:type event:Event.\r\n" +
             "OPTIONAL { ?event event:city ?city.}\r\n" +
@@ -54,6 +52,7 @@ public class SemanticRetrieval {
                 event = new JSONObject();
                 QuerySolution soln = results.nextSolution();
 
+                System.out.println(soln.toString());
                 if (soln.contains("city")) {
 
                     event.put("city", soln.get("city"));
@@ -102,7 +101,7 @@ public class SemanticRetrieval {
                         "prefix xsd:<http://www.w3.org/2001/XMLSchema#>\r\n" +
                         "\r\n" +
                         "select * " +
-                        "FROM <"+SemanticRepresentation.repository+"> \r\n"+
+                        "FROM <"+MyResource.repository+"> \r\n"+
 
                         "where {\r\n" +
                         "?e_event time:inXSDDateTimeStamp ?e_timestamp.\r\n" +
@@ -143,7 +142,7 @@ public class SemanticRetrieval {
                         "\r\n" +
 
                         "select * " +
-                        "FROM <"+SemanticRepresentation.repository+"> \r\n"+
+                        "FROM <"+MyResource.repository+"> \r\n"+
 
                         "where {\r\n" +
                         "?e_event time:inXSDDateTimeStamp ?e_timestamp.\r\n" +

@@ -115,7 +115,7 @@
     <version>3.1.0</version>
 </dependency>
 
- <!--     <dependency>
+    <dependency>
      <groupId>com.openlink.virtuoso</groupId>
    <artifactId>virtjdbc4</artifactId>
     <version>4.0</version>
@@ -129,7 +129,7 @@
     <version>3.0</version>
     <scope>system</scope>
     <systemPath>${project.basedir}/virt_jena3.jar</systemPath>
-</dependency> -->
+</dependency> 
 
 
     </dependencies>

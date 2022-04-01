@@ -25,16 +25,6 @@ public class DataReceiver {
 
 	public static String eventReceiver(String cityLat, String cityLong, String year, String month, String day, String magnitude, String source, String username, String password) throws IOException {
 
-		/*  examples:
-		    cityLat = "37.97945"; //2019
-		  	cityLong= "23.71622";
-		
-		    cityLat = "16.56"; //2021
-		    cityLong= "-60.78";
-
-		    cityLat = "39.776"; //2021
-		    cityLong= "22.08";
-		 */
 		
 		  String date, enddate;
 		  if(month.equals("null")) {
@@ -73,9 +63,7 @@ public class DataReceiver {
 	}
 	public static JSONArray productsReceiver(String eventDate, String eventLat, String eventLong, String source, String username, String password) throws IOException, UnirestException {
 		
-		  /* Configuration file: 
-		   •	sensing date of the data source(s) in the form of yyyy-mm-dd ?
-		  */
+		  
 		  String minus = dateCalculation(eventDate.substring(0, 10), "minus");
 		  String plus = dateCalculation(eventDate.substring(0, 10), "plus");
 		  ArrayList <String> dataSources = new ArrayList <String> ();
@@ -104,13 +92,15 @@ public class DataReceiver {
 
 			  BufferedReader reader = new BufferedReader(
 	                  new InputStreamReader(conn.getInputStream()));
-	          for (String line; (line = reader.readLine()) != null; ) {
-	             
-	             result+=line; 
-	          }
-	          
-	          
-	          finalresult=DataTranslator.translateCopernicusMetadata(result.toString(), "dhus");
+			  if(conn.getResponseCode()==200) {
+		          for (String line; (line = reader.readLine()) != null; ) {
+		             
+		             result+=line; 
+		          }
+		          
+		          
+		          finalresult=DataTranslator.translateCopernicusMetadata(result.toString(), "dhus");
+			  }
 		  }
 		  else {
 			  result = "";

@@ -15,7 +15,8 @@ ADD /libs/virtjdbc4.jar /code/virtjdbc4.jar
 
 ENV KB_ADDRESS default_env_value
 
-ADD configuration.json /code/config/configuration.json
+#ADD configuration.json /code/config/configuration.json
+ADD cities_countries_clear.json /code/cities_countries_clear.json
 
 # Adding source, compile and package into a fat jar
 ADD src /code/src

@@ -2,11 +2,9 @@
 package com.application.SemanticFramework;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,7 +12,6 @@ import java.util.UUID;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -24,7 +21,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.json.JSONArray;
@@ -1613,16 +1609,7 @@ public class MyResource {
 			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
 
 			String location = "POINT (" + latitude + " " + longitude + ")";
-			/*String events = DataReceiver.eventReceiver(latitude, longitude, year, month, day, magnitude, eventSource,
-					eventUsername, eventPassword, logger);
-			System.out.println("[latitude]:" + latitude + " [longitude]" + longitude + " [year]:" + year + " [month]:"
-					+ month + " [day]:" + day + " [magnitude]:" + magnitude + " [city]:" + city + " [country]:"
-					+ country);
-			logger.info("[latitude]:" + latitude + " [longitude]" + longitude + " [year]:" + year + " [month]:" + month
-					+ " [day]:" + day + " [magnitude]:" + magnitude + " [city]:" + city + " [country]:" + country);
-			JSONArray translatedEvents = DataTranslator.translateEvents(events);*/
-			//String events = DataReceiver.eventReceiver(latitude, longitude, year, month, day, magnitude, eventSource,
-				//	eventUsername, eventPassword, logger);
+			
 			System.out.println("[latitude]:" + latitude + " [longitude]" + longitude + " [year]:" + year + " [month]:"
 					+ month + " [day]:" + day + " [magnitude]:" + magnitude + " [city]:" + city + " [country]:"
 					+ country);

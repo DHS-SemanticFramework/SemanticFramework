@@ -11,14 +11,16 @@ services:
         volumes:
             - './pwd:/database'
     sf-api:
-        image: collaborativedhs/semantic_framework:latest
+        image: collaborativedhs/semantic_framework:v1.0
         depends_on:
             - sf-kb
         ports:
             - '8087:8080'    
         volumes:
             - ./config/configuration.json:/config/configuration.json
+            - .:/logs
         environment:
             - 'KB_ADDRESS=jdbc:virtuoso://sf-kb:1111'
+            - 'KB_ADDRESS_REPO=http://sf-kb:8890/'
             - 'KB_ADDRESS_RETRIEVE=http://sf-kb:8890/sparql'
         

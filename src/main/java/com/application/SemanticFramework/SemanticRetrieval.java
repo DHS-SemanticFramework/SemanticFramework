@@ -7,15 +7,16 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public class SemanticRetrieval {
 
-	public static JSONArray retrieve(String uuid, ArrayList<String> copernicusSources, String service, Logger logger) {
+	public static JsonArray retrieve(String uuid, ArrayList<String> copernicusSources, String service, Logger logger) {
 
-		JSONArray events = new JSONArray();
-		JSONObject event = new JSONObject();
+		JsonArray events = new JsonArray();
+		JsonObject event = new JsonObject();
 
 		String query;
 
@@ -39,50 +40,47 @@ public class SemanticRetrieval {
 		try {
 			ResultSet results = qe.execSelect();
 			for (; results.hasNext();) {
-				event = new JSONObject();
+				event = new JsonObject();
 				QuerySolution soln = results.nextSolution();
 
-				if (soln.contains("city")) {
-
-					event.put("city", soln.get("city"));
-				}
-				if (soln.contains("country")) {
-
-					event.put("country", soln.get("country"));
-				}
-				event.put("year", soln.get("year"));
+				event.addProperty("year", soln.get("year").toString());
 				if (soln.contains("month")) {
 
-					event.put("month", soln.get("month"));
+					event.addProperty("month", soln.get("month").toString());
 				}
 				if (soln.contains("day")) {
 
-					event.put("day", soln.get("day"));
+					event.addProperty("day", soln.get("day").toString());
 				}
+				if (soln.contains("city")) {
+
+					event.addProperty("city", soln.get("city").toString());
+				}
+				if (soln.contains("country")) {
+
+					event.addProperty("country", soln.get("country").toString());
+				}
+				
 				if (soln.contains("place")) {
 
-					event.put("location_coordinates", soln.get("place"));
+					event.addProperty("location_coordinates", soln.get("place").toString());
 				}
-				JSONObject m_value = new JSONObject();
-				m_value.put("value", soln.get("magnitude"));
-				event.put("magnitude", m_value);
-				JSONObject d_value = new JSONObject();
-				d_value.put("value", soln.get("depth"));
-				event.put("depth", d_value);
-				JSONObject lat_value = new JSONObject();
-				lat_value.put("value", soln.get("latitude"));
-				JSONObject values = new JSONObject();
-				values.put("latitude", lat_value);
-				JSONObject long_value = new JSONObject();
-				long_value.put("value", soln.get("longitude"));
-
-				values.put("longitude", long_value);
-				event.put("epicentral_location", values);
-
-				event.put("timestamp", soln.get("e_timestamp"));
+				
+				JsonObject m_value = new JsonObject();
+				m_value.addProperty("value", soln.get("magnitude").toString());		
+				JsonObject d_value = new JsonObject();
+				d_value.addProperty("value", soln.get("depth").toString());
+				JsonObject lat_value = new JsonObject();
+				lat_value.addProperty("value", soln.get("latitude").toString());
+				JsonObject values = new JsonObject();
+				values.add("latitude", lat_value);
+				JsonObject long_value = new JsonObject();
+				long_value.addProperty("value", soln.get("longitude").toString());
+				values.add("longitude", long_value);	
+				String timestamp = soln.get("e_timestamp").toString();
 				String e_event = soln.get("e_event").toString();
-				JSONArray images_before = new JSONArray();
-				JSONArray images_after = new JSONArray();
+				JsonArray images_before = new JsonArray();
+				JsonArray images_after = new JsonArray();
 				for (int i = 0; i < copernicusSources.size(); i++) {
 					query = "prefix event:<http://purl.org/NET/c4dm/event.owl#>\r\n"
 							+ "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\r\n"
@@ -107,7 +105,7 @@ public class SemanticRetrieval {
 						for (; results2.hasNext();) {
 							QuerySolution soln2 = results2.nextSolution();
 
-							images_after.put(soln2.get("p_url"));
+							images_after.add(soln2.get("p_url").toString());
 						}
 					} catch (Exception e) {
 						logger.info("Query error:" + e);
@@ -141,7 +139,7 @@ public class SemanticRetrieval {
 
 							QuerySolution soln3 = results3.nextSolution();
 
-							images_before.put(soln3.get("p_url"));
+							images_before.add(soln3.get("p_url").toString());
 						}
 					} catch (Exception e) {
 						logger.info("Query error:" + e);
@@ -151,10 +149,16 @@ public class SemanticRetrieval {
 						qe3.close();
 					}
 				}
-				event.put("image_before", images_before);
-				event.put("image_after", images_after);
-				events.put(event);
-				event = new JSONObject();
+				event.add("image_before", images_before);
+				event.add("image_after", images_after);
+				
+				event.add("magnitude", m_value);
+				event.add("depth", d_value);
+				event.add("epicentral_location", values);
+				event.addProperty("timestamp", timestamp);
+				
+				events.add(event);
+				event = new JsonObject();
 			}
 		} catch (Exception e) {
 			logger.info("Query error:" + e);

@@ -2,6 +2,7 @@
 package com.application.SemanticFramework;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -47,11 +49,33 @@ public class MyResource {
 
 		String kb_address_retrieve = System.getenv("KB_ADDRESS_RETRIEVE");
 		Logger logger = Logger.getLogger("MyLog");
+		
 		FileHandler fh = null;
 		try {
+			File file = new File("/logs/logFile.log");
+			file.setWritable(true);
+			file.setReadable(true);
+			file.setExecutable(true);
 			
+			/*Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+		    perms.add(PosixFilePermission.OWNER_READ);
+		    perms.add(PosixFilePermission.OWNER_WRITE);
+		    perms.add(PosixFilePermission.OWNER_EXECUTE);
+
+		    perms.add(PosixFilePermission.OTHERS_READ);
+		    perms.add(PosixFilePermission.OTHERS_WRITE);
+		    perms.add(PosixFilePermission.OTHERS_EXECUTE);
+
+		    perms.add(PosixFilePermission.GROUP_READ);
+		    perms.add(PosixFilePermission.GROUP_WRITE);
+		    perms.add(PosixFilePermission.GROUP_EXECUTE);
+
+		    Files.setPosixFilePermissions(file.toPath(), perms);*/
+		    
 			fh = new FileHandler("/logs/logFile.log", true);
+			
 			logger.addHandler(fh);
+			
 			SimpleFormatter formatter = new SimpleFormatter();
 			fh.setFormatter(formatter);
 
@@ -379,6 +403,14 @@ public class MyResource {
 												&& keywordList.get(counter_country + 4).toString().length() == 2) {
 
 											month = keywordList.get(counter_country + 4);
+											if(Integer.parseInt(month)<1 || Integer.parseInt(month)>12 ) {
+												response = "Month expected after year as an integer value between 1 and 12.";
+												JsonObject error = new JsonObject();
+												error.addProperty("error", response);
+												logger.info("[Response code]: 200, [Response]: " + error + "\n");
+												fh.close();
+												return Response.status(200).entity(error.toString()).build();
+											}
 											if (keywordList.size() > counter_country + 5) {
 												if (!keywordList.get(counter_country + 5).equals("with")) {
 													if (!isInteger(keywordList.get(counter_country + 5)) || keywordList
@@ -644,10 +676,16 @@ public class MyResource {
 												&& keywordList.get(counter_country + 4).toString().length() == 2) {
 
 											month = keywordList.get(counter_country + 4);
-
+											if(Integer.parseInt(month)<1 || Integer.parseInt(month)>12 ) {
+												response = "Month expected after year as an integer value between 1 and 12.";
+												JsonObject error = new JsonObject();
+												error.addProperty("error", response);
+												logger.info("[Response code]: 200, [Response]: " + error + "\n");
+												fh.close();
+												return Response.status(200).entity(error.toString()).build();
+											}
 										}
 									}
-
 								} else {
 									response = "Expected 4-digit integer for 'year'. Input should follow the following pattern: "
 											+ "“earthquake located in <city>, <country> in <year> <month> <day> with magnitude greater than <magnitude>” . "
@@ -921,6 +959,14 @@ public class MyResource {
 													.get(counter_country + counter + 4).toString().length() == 2) {
 
 												month = keywordList.get(counter_country + counter + 4);
+												if(Integer.parseInt(month)<1 || Integer.parseInt(month)>12 ) {
+													response = "Month expected after year as an integer value between 1 and 12.";
+													JsonObject error = new JsonObject();
+													error.addProperty("error", response);
+													logger.info("[Response code]: 200, [Response]: " + error + "\n");
+													fh.close();
+													return Response.status(200).entity(error.toString()).build();
+												}
 												if (keywordList.size() > counter_country + counter + 5) {
 													if (!keywordList.get(counter_country + counter + 5)
 															.equals("with")) {
@@ -1325,6 +1371,14 @@ public class MyResource {
 														&& keywordList.get(5).toString().length() == 2) {
 
 													month = keywordList.get(5);
+													if(Integer.parseInt(month)<1 || Integer.parseInt(month)>12 ) {
+														response = "Month expected after year as an integer value between 1 and 12.";
+														JsonObject error = new JsonObject();
+														error.addProperty("error", response);
+														logger.info("[Response code]: 200, [Response]: " + error + "\n");
+														fh.close();
+														return Response.status(200).entity(error.toString()).build();
+													}
 													if (keywordList.size() > 6) {
 														if (isInteger(keywordList.get(6))
 																&& keywordList.get(6).toString().length() == 2) {
@@ -1564,6 +1618,7 @@ public class MyResource {
 				e.printStackTrace();
 			}
 			ArrayList<String> copernicusSources = new ArrayList<String>();
+			ArrayList<String> copernicusAddresses = new ArrayList<String>();
 			ArrayList<String> copernicusUsername = new ArrayList<String>();
 			ArrayList<String> copernicusPassword = new ArrayList<String>();
 
@@ -1577,8 +1632,10 @@ public class MyResource {
 						if (obj.get("dataSource").getAsString().contains("[DHuSAddress]") && obj.has("DHuSAddress")) {
 							copernicusSources.add(obj.get("dataSource").getAsString().replace("[DHuSAddress]",
 									obj.get("DHuSAddress").getAsString()));
+							copernicusAddresses.add(obj.get("DHuSAddress").getAsString());
 						} else {
 							copernicusSources.add(obj.get("dataSource").getAsString());
+							copernicusAddresses.add("null");
 						}
 						copernicusUsername.add(obj.get("username").getAsString());
 						copernicusPassword.add(obj.get("password").getAsString());
@@ -1641,18 +1698,18 @@ public class MyResource {
 							DataReceiver.productsReceiver(translatedEvents.getJSONObject(i).getString("timestamp"),
 									translatedEvents.getJSONObject(i).getString("latitude"),
 									translatedEvents.getJSONObject(i).getString("longitude"), copernicusSources.get(j),
-									copernicusUsername.get(j), copernicusPassword.get(j), logger));
+									copernicusUsername.get(j), copernicusPassword.get(j), logger, copernicusAddresses.get(j)));
 				}
 				model = SemanticRepresentation.resultsMapping(result, uuid, model, copernicusSources);
 
 			}
 			SemanticRepresentation.storeModel(model, kb_address, repository);
 
-			JSONArray results = new JSONArray();
+			JsonArray results = new JsonArray();
 			results = SemanticRetrieval.retrieve(uuid, copernicusSources, kb_address_retrieve, logger);
 			logger.info("[Response code]: 200, [Response]: " + results.toString() + "\n");
 			fh.close();
-			return Response.status(200).entity(results.toString()).build();
+			return Response.status(200).entity(String.valueOf(results)).build();
 		} else if (task.equals("population")) {
 			String kb_address = System.getenv("KB_ADDRESS");
 

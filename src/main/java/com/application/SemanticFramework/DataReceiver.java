@@ -69,7 +69,7 @@ public class DataReceiver {
 	}
 
 	public static JSONArray productsReceiver(String eventDate, String eventLat, String eventLong, String source,
-			String username, String password, Logger logger) {
+			String username, String password, Logger logger, String address) {
 
 		String minus = dateCalculation(eventDate.substring(0, 10), "minus");
 		String plus = dateCalculation(eventDate.substring(0, 10), "plus");
@@ -109,7 +109,7 @@ public class DataReceiver {
 						result += line;
 					}
 
-					finalresult = DataTranslator.translateCopernicusMetadata(result.toString(), "dhus");
+					finalresult = DataTranslator.translateCopernicusMetadata(result.toString(), "dhus", address);
 				} else {
 
 					logger.info("[Response code from " + source + "]: " + conn.getResponseCode() + " \n");
@@ -129,7 +129,7 @@ public class DataReceiver {
 
 				result += respon.getBody();
 
-				finalresult = DataTranslator.translateCopernicusMetadata(result.toString(), "onda-dias");
+				finalresult = DataTranslator.translateCopernicusMetadata(result.toString(), "onda-dias", address);
 			} catch (UnirestException e) {
 
 				logger.severe("Exception:" + e);

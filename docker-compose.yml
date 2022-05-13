@@ -11,7 +11,7 @@ services:
         volumes:
             - './pwd:/database'
     sf-api:
-        image: collaborativedhs/semantic_framework:v1.0
+        image: collaborativedhs/semantic_framework:v1.1
         depends_on:
             - sf-kb
         ports:

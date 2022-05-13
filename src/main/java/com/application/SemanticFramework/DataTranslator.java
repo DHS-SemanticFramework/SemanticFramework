@@ -46,7 +46,7 @@ public class DataTranslator {
 		return translatedEvents;
 	}
 
-	public static JSONArray translateCopernicusMetadata(String results, String source) {
+	public static JSONArray translateCopernicusMetadata(String results, String source, String address) {
 
 		/*Acceptable data schema for copernicus metadata:
 		 * [
@@ -71,10 +71,9 @@ public class DataTranslator {
 				for (int i = 0; i < entry.size(); i++) {
 
 					product = new JSONObject();
-
 					product.put("id", entry.get(i).getAsJsonObject().get("id").getAsString());
-					product.put("productURL", "https://scihub.copernicus.eu/dhus/odata/v1/Products('"
-							+ entry.get(i).getAsJsonObject().get("id").getAsString() + "')/");
+					product.put("productURL", "https://"+address+"/odata/v1/Products('" 
+							+ entry.get(i).getAsJsonObject().get("id").getAsString() + "')"); 
 					for (int j = 0; j < entry.get(i).getAsJsonObject().getAsJsonArray("date").size(); j++) {
 						if (entry.get(i).getAsJsonObject().getAsJsonArray("date").get(j).getAsJsonObject().get("name")
 								.getAsString().equals("beginposition")) {

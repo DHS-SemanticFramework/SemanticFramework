@@ -78,6 +78,7 @@ public class SemanticRepresentation {
 						result.getJSONObject("event").getString("timestamp").length() - 4) + "Z");
 
 		for (int j = 0; j < copernicusSources.size(); j++) {
+			
 			for (int i = 0; i < result.getJSONArray(copernicusSources.get(j)).length(); i++) {
 				uuid2 = UUID.randomUUID().toString().replaceAll("-", "");
 				String product_instance = Prefixes.event + "Product_" + uuid2;

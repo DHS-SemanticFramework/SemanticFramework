@@ -1,35 +1,29 @@
-May 13, 2022 8:43:02 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [Response code]: 200, [Response]: {"error":"Month expected after year as an integer value between 1 and 12."}
-
-May 13, 2022 8:43:34 AM com.application.SemanticFramework.MyResource retrieval
+May 19, 2022 7:21:00 AM com.application.SemanticFramework.MyResource retrieval
 INFO: [Response code]: 200, [Response]: {"error":"Location not found. Please make sure to add a valid city and country name."}
 
-May 13, 2022 8:44:33 AM com.application.SemanticFramework.MyResource retrieval
+May 19, 2022 7:21:46 AM com.application.SemanticFramework.MyResource retrieval
 INFO: [Response code]: 200, [Response]: {"status":"Successfully added to KB."}
 
-May 13, 2022 8:44:43 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [latitude]:37.97945 [longitude]23.71622 [year]:2019 [month]:null [day]:null [magnitude]:5.0 [city]:Athens [country]:Greece
-May 13, 2022 8:44:49 AM com.application.SemanticFramework.DataReceiver productsReceiver
-INFO: [Response code from https://scihub.copernicus.eu/dhus/search?q=(platformname:Sentinel-1%20AND%20producttype:SLC%20AND%20sensoroperationalmode:IW%20AND%20footprint:%22Intersects(POINT(23.5393%2038.1076))%22%20AND%20beginposition:[2019-07-07T00:00:00.000Z%20TO%202019-07-31T00:00:00.000Z])&format=json]: 401 
+May 19, 2022 7:22:30 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [latitude]:-5.19449 [longitude]-80.63282 [year]:2021 [month]:null [day]:null [magnitude]:5.0 [city]:Piura [country]:Peru
+May 19, 2022 7:22:33 AM com.application.SemanticFramework.DataReceiver productsReceiver
+INFO: [Response code from https://scihub.copernicus.eu/dhus/search?start=0&rows=100&q=(platformname:Sentinel-1%20AND%20producttype:SLC%20AND%20sensoroperationalmode:IW%20AND%20footprint:%22Intersects(POINT(-80.6695%20-4.90078))%22%20AND%20beginposition:[2021-07-18T00:00:00.000Z%20TO%202021-08-11T00:00:00.000Z])&format=json]: 401 
 
-May 13, 2022 8:44:49 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [Response code]: 200, [Response]: [{"year":"2019","city":"Athens","country":"Greece","location_coordinates":"POINT (37.97945 23.71622)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(62de7444-cf07-4785-9273-4a4b3cb4bba5)"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(fb997d3c-0a3d-4d10-b9f2-46fb16cc982a)"],"magnitude":{"value":"5.2"},"depth":{"value":"19.7"},"epicentral_location":{"latitude":{"value":"38.1076"},"longitude":{"value":"23.5393"}},"timestamp":"2019-07-19T11:13:17.66Z"}]
+May 19, 2022 7:22:34 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [Response code]: 200, [Response]: [{"year":"2021","city":"Piura","country":"Peru","location_coordinates":"POINT (-5.19449 -80.63282)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(6af6ef5a-55b9-4aa1-a770-02793e57deba)"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(7232c01c-8d35-4332-b209-71dae63cbc34)"],"magnitude":{"value":"6.2"},"depth":{"value":"19.5"},"epicentral_location":{"latitude":{"value":"-4.90078"},"longitude":{"value":"-80.6695"}},"timestamp":"2021-07-30T17:10:18.64Z"}]
 
-May 13, 2022 8:45:25 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [latitude]:37.97945 [longitude]23.71622 [year]:2019 [month]:null [day]:null [magnitude]:5.0 [city]:Athens [country]:Greece
-May 13, 2022 8:45:30 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [Response code]: 200, [Response]: [{"year":"2019","city":"Athens","country":"Greece","location_coordinates":"POINT (37.97945 23.71622)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(62de7444-cf07-4785-9273-4a4b3cb4bba5)","https://scihub.copernicus.eu/dhus/odata/v1/Products('62de7444-cf07-4785-9273-4a4b3cb4bba5')"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(fb997d3c-0a3d-4d10-b9f2-46fb16cc982a)","https://scihub.copernicus.eu/dhus/odata/v1/Products('fb997d3c-0a3d-4d10-b9f2-46fb16cc982a')"],"magnitude":{"value":"5.2"},"depth":{"value":"19.7"},"epicentral_location":{"latitude":{"value":"38.1076"},"longitude":{"value":"23.5393"}},"timestamp":"2019-07-19T11:13:17.66Z"}]
+May 19, 2022 7:22:48 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [latitude]:-5.19449 [longitude]-80.63282 [year]:2021 [month]:null [day]:null [magnitude]:5.0 [city]:Piura [country]:Peru
+May 19, 2022 7:22:50 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [Response code]: 200, [Response]: [{"year":"2021","city":"Piura","country":"Peru","location_coordinates":"POINT (-5.19449 -80.63282)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(6af6ef5a-55b9-4aa1-a770-02793e57deba)","https://scihub.copernicus.eu/dhus/odata/v1/Products('6af6ef5a-55b9-4aa1-a770-02793e57deba')"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(7232c01c-8d35-4332-b209-71dae63cbc34)","https://scihub.copernicus.eu/dhus/odata/v1/Products('7232c01c-8d35-4332-b209-71dae63cbc34')"],"magnitude":{"value":"6.2"},"depth":{"value":"19.5"},"epicentral_location":{"latitude":{"value":"-4.90078"},"longitude":{"value":"-80.6695"}},"timestamp":"2021-07-30T17:10:18.64Z"}]
 
-May 13, 2022 8:46:36 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [latitude]:37.97945 [longitude]23.71622 [year]:2019 [month]:07 [day]:19 [magnitude]:5.0 [city]:Athens [country]:Greece
-May 13, 2022 8:46:40 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [Response code]: 200, [Response]: [{"year":"2019","month":"07","day":"19","city":"Athens","country":"Greece","location_coordinates":"POINT (37.97945 23.71622)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(62de7444-cf07-4785-9273-4a4b3cb4bba5)","https://scihub.copernicus.eu/dhus/odata/v1/Products('62de7444-cf07-4785-9273-4a4b3cb4bba5')"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(fb997d3c-0a3d-4d10-b9f2-46fb16cc982a)","https://scihub.copernicus.eu/dhus/odata/v1/Products('fb997d3c-0a3d-4d10-b9f2-46fb16cc982a')"],"magnitude":{"value":"5.2"},"depth":{"value":"19.7"},"epicentral_location":{"latitude":{"value":"38.1076"},"longitude":{"value":"23.5393"}},"timestamp":"2019-07-19T11:13:17.66Z"}]
+May 19, 2022 7:23:14 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [latitude]:-5.19449 [longitude]-80.63282 [year]:2021 [month]:null [day]:null [magnitude]:5.0 [city]:Piura [country]:Peru
+May 19, 2022 7:23:19 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [Response code]: 200, [Response]: [{"year":"2021","city":"Piura","country":"Peru","location_coordinates":"POINT (-5.19449 -80.63282)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(6af6ef5a-55b9-4aa1-a770-02793e57deba)","https://scihub.copernicus.eu/dhus/odata/v1/Products('6af6ef5a-55b9-4aa1-a770-02793e57deba')","https://colhub.copernicus.eu/dhus/odata/v1/Products('6af6ef5a-55b9-4aa1-a770-02793e57deba')"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(7232c01c-8d35-4332-b209-71dae63cbc34)","https://scihub.copernicus.eu/dhus/odata/v1/Products('7232c01c-8d35-4332-b209-71dae63cbc34')","https://colhub.copernicus.eu/dhus/odata/v1/Products('7232c01c-8d35-4332-b209-71dae63cbc34')"],"magnitude":{"value":"6.2"},"depth":{"value":"19.5"},"epicentral_location":{"latitude":{"value":"-4.90078"},"longitude":{"value":"-80.6695"}},"timestamp":"2021-07-30T17:10:18.64Z"}]
 
-May 13, 2022 8:47:18 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [latitude]:10.56839 [longitude]-62.82628 [year]:2018 [month]:08 [day]:null [magnitude]:5.0 [city]:Yaguaraparo [country]:Venezuela
-May 13, 2022 8:47:24 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [Response code]: 200, [Response]: [{"year":"2018","month":"08","city":"Yaguaraparo","country":"Venezuela","location_coordinates":"POINT (10.56839 -62.82628)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(f471aa68-62dc-4d73-a20c-8e327c995928)","https://scihub.copernicus.eu/dhus/odata/v1/Products('f471aa68-62dc-4d73-a20c-8e327c995928')"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(f5849709-1c58-4394-bd6d-92e9d5789f27)","https://scihub.copernicus.eu/dhus/odata/v1/Products('f5849709-1c58-4394-bd6d-92e9d5789f27')"],"magnitude":{"value":"7.0"},"depth":{"value":"105.5"},"epicentral_location":{"latitude":{"value":"10.6664"},"longitude":{"value":"-62.8945"}},"timestamp":"2018-08-21T21:31:41.28Z"}]
-
-May 13, 2022 8:48:31 AM com.application.SemanticFramework.MyResource retrieval
-INFO: [Response code]: 200, [Response]: {"error":"Month expected after year as an integer value between 1 and 12."}
+May 19, 2022 7:23:43 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [latitude]:-5.19449 [longitude]-80.63282 [year]:2021 [month]:null [day]:null [magnitude]:5.0 [city]:Piura [country]:Peru
+May 19, 2022 7:23:49 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [Response code]: 200, [Response]: [{"year":"2021","city":"Piura","country":"Peru","location_coordinates":"POINT (-5.19449 -80.63282)","image_before":["https://catalogue.onda-dias.eu/dias-catalogue/Products(6af6ef5a-55b9-4aa1-a770-02793e57deba)","https://colhub.copernicus.eu/dhus/odata/v1/Products('6af6ef5a-55b9-4aa1-a770-02793e57deba')"],"image_after":["https://catalogue.onda-dias.eu/dias-catalogue/Products(7232c01c-8d35-4332-b209-71dae63cbc34)","https://colhub.copernicus.eu/dhus/odata/v1/Products('7232c01c-8d35-4332-b209-71dae63cbc34')"],"magnitude":{"value":"6.2"},"depth":{"value":"19.5"},"epicentral_location":{"latitude":{"value":"-4.90078"},"longitude":{"value":"-80.6695"}},"timestamp":"2021-07-30T17:10:18.64Z"}]
 

@@ -56,21 +56,6 @@ public class MyResource {
 			file.setWritable(true);
 			file.setReadable(true);
 			file.setExecutable(true);
-			
-			/*Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
-		    perms.add(PosixFilePermission.OWNER_READ);
-		    perms.add(PosixFilePermission.OWNER_WRITE);
-		    perms.add(PosixFilePermission.OWNER_EXECUTE);
-
-		    perms.add(PosixFilePermission.OTHERS_READ);
-		    perms.add(PosixFilePermission.OTHERS_WRITE);
-		    perms.add(PosixFilePermission.OTHERS_EXECUTE);
-
-		    perms.add(PosixFilePermission.GROUP_READ);
-		    perms.add(PosixFilePermission.GROUP_WRITE);
-		    perms.add(PosixFilePermission.GROUP_EXECUTE);
-
-		    Files.setPosixFilePermissions(file.toPath(), perms);*/
 		    
 			fh = new FileHandler("/logs/logFile.log", true);
 			
@@ -1659,7 +1644,6 @@ public class MyResource {
 						logger.info("[Response code]: 200, [Response]: " + error + "\n");
 						fh.close();
 						return Response.status(200).entity(error.toString()).build();
-
 					}
 				}
 			}
@@ -1672,9 +1656,10 @@ public class MyResource {
 					+ country);
 			logger.info("[latitude]:" + latitude + " [longitude]" + longitude + " [year]:" + year + " [month]:" + month
 					+ " [day]:" + day + " [magnitude]:" + magnitude + " [city]:" + city + " [country]:" + country);
+			
 			JSONArray translatedEvents = DataReceiver.eventReceiver(latitude, longitude, year, month, day, magnitude, eventSource,
 					eventUsername, eventPassword, logger);
-
+			
 			JSONObject result = new JSONObject();
 			Model model = ModelFactory.createDefaultModel();
 			String source = "";
@@ -1686,13 +1671,8 @@ public class MyResource {
 				result = new JSONObject();
 				result.put("event", translatedEvents.get(i));
 				for (int j = 0; j < copernicusSources.size(); j++) {
-					if (copernicusSources.get(j).contains("scihub")) {
-
-						source = copernicusSources.get(j);
-					} else if (copernicusSources.get(j).contains("onda-dias")) {
-
-						source = copernicusSources.get(j);
-					}
+					
+					source = copernicusSources.get(j);
 
 					result.put(source,
 							DataReceiver.productsReceiver(translatedEvents.getJSONObject(i).getString("timestamp"),

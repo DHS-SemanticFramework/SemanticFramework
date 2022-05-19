@@ -8,14 +8,14 @@
       "type": "copernicus",
       "associatedId": "1"
     },
-     {
+    {
       "DHuSAddress": "scihub.copernicus.eu/dhus",
-      "dataSource": "https://[DHuSAddress]/search?q=(platformname:Sentinel-1%20AND%20producttype:SLC%20AND%20sensoroperationalmode:IW%20AND%20footprint:%22Intersects(POINT([eventLat]%20[eventLong]))%22%20AND%20beginposition:[[eventStartTime]T00:00:00.000Z%20TO%20[eventEndTime]T00:00:00.000Z])&format=json",
+      "dataSource": "https://[DHuSAddress]/search?start=0&rows=100&q=(platformname:Sentinel-1%20AND%20producttype:SLC%20AND%20sensoroperationalmode:IW%20AND%20footprint:%22Intersects(POINT([eventLat]%20[eventLong]))%22%20AND%20beginposition:[[eventStartTime]T00:00:00.000Z%20TO%20[eventEndTime]T00:00:00.000Z])&format=json",
       "username": "xxx",
       "password": "xxx",
       "type": "copernicus",
       "associatedId": "1"
-    },
+    },	
     {
       "dataSource": "https://webservices.ingv.it/fdsnws/event/1/query?starttime=[SelectedDate]T00:00:00&endtime=[EndDate]T23:59:59&minmagnitude=[magnitude]&format=text&lat=[CityLat]&lon=[CityLong]&maxradiuskm=50",
       "username": "null",

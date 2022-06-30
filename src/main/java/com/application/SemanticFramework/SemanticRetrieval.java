@@ -13,10 +13,17 @@ import com.google.gson.JsonObject;
 
 public class SemanticRetrieval {
 
-	public static JsonArray retrieve(String uuid, ArrayList<String> copernicusSources, String service, Logger logger) {
+	public static JsonArray retrieve(String uuid, ArrayList<String> copernicusSources, String service, Logger logger,
+			ArrayList<String> additionalFields) {
 
 		JsonArray events = new JsonArray();
 		JsonObject event = new JsonObject();
+
+		String additionals = "";
+		for (int i = 0; i < additionalFields.size(); i++) {
+			additionals += "?e_event event:" + additionalFields.get(i) + " ?" + additionalFields.get(i) + ".\r\n";
+
+		}
 
 		String query;
 
@@ -28,9 +35,9 @@ public class SemanticRetrieval {
 				+ "OPTIONAL { ?event event:city ?city.}\r\n" + "OPTIONAL {?event event:country ?country.}\r\n"
 				+ "?event time:year ?year.\r\n" + "OPTIONAL {?event time:month ?month.}\r\n"
 				+ "OPTIONAL {?event time:day ?day.}\r\n" + "OPTIONAL {?event event:place ?place.}\r\n"
-				+ "?event event:hasSubEvent ?e_event.\r\n" + "?e_event event:hasId ?id.\r\n"
-				+ "?e_event event:magnitude ?magnitude.\r\n" + "?e_event event:depth ?depth.\r\n"
-				+ "?e_event event:latitude ?latitude.\r\n" + "?e_event event:longitude ?longitude.\r\n"
+				+ "?event event:hasSubEvent ?e_event.\r\n" + "OPTIONAL{?e_event event:hasId ?id.}\r\n"
+				+ "OPTIONAL {?e_event event:magnitude ?magnitude.}\r\n" + "OPTIONAL {?e_event event:depth ?depth.}\r\n"
+				+ additionals + "?e_event event:latitude ?latitude.\r\n" + "?e_event event:longitude ?longitude.\r\n"
 				+ "?e_event time:inXSDDateTimeStamp ?e_timestamp.\r\n" + "\r\n"
 				+ " FILTER (?event=<http://purl.org/NET/c4dm/event.owl#Event_" + uuid + ">)\r\n" +
 
@@ -60,23 +67,19 @@ public class SemanticRetrieval {
 
 					event.addProperty("country", soln.get("country").toString());
 				}
-				
+
 				if (soln.contains("place")) {
 
 					event.addProperty("location_coordinates", soln.get("place").toString());
 				}
-				
-				JsonObject m_value = new JsonObject();
-				m_value.addProperty("value", soln.get("magnitude").toString());		
-				JsonObject d_value = new JsonObject();
-				d_value.addProperty("value", soln.get("depth").toString());
+
 				JsonObject lat_value = new JsonObject();
 				lat_value.addProperty("value", soln.get("latitude").toString());
 				JsonObject values = new JsonObject();
 				values.add("latitude", lat_value);
 				JsonObject long_value = new JsonObject();
 				long_value.addProperty("value", soln.get("longitude").toString());
-				values.add("longitude", long_value);	
+				values.add("longitude", long_value);
 				String timestamp = soln.get("e_timestamp").toString();
 				String e_event = soln.get("e_event").toString();
 				JsonArray images_before = new JsonArray();
@@ -151,12 +154,24 @@ public class SemanticRetrieval {
 				}
 				event.add("image_before", images_before);
 				event.add("image_after", images_after);
-				
-				event.add("magnitude", m_value);
-				event.add("depth", d_value);
+				if (soln.contains("magnitude")) {
+					JsonObject m_value = new JsonObject();
+					m_value.addProperty("value", soln.get("magnitude").toString());
+					event.add("magnitude", m_value);
+				}
+				if (soln.contains("depth")) {
+					JsonObject d_value = new JsonObject();
+					d_value.addProperty("value", soln.get("depth").toString());
+					event.add("depth", d_value);
+				}
+				for (int i = 0; i < additionalFields.size(); i++) {
+					if (soln.contains(additionalFields.get(i))) {
+						event.addProperty(additionalFields.get(i), soln.get(additionalFields.get(i)).toString());
+					}
+				}
 				event.add("epicentral_location", values);
 				event.addProperty("timestamp", timestamp);
-				
+
 				events.add(event);
 				event = new JsonObject();
 			}

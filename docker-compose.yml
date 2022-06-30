@@ -10,10 +10,18 @@ services:
             - '8890:8890'
         volumes:
             - './pwd:/database'
+    dr-api:
+        image: collaborativedhs/sf-datareceiver:v2.0
+        container_name: dr
+        ports:
+            - '8088:8080'    
+        volumes:
+            - .:/logs       
     sf-api:
-        image: collaborativedhs/semantic_framework:v1.2
+        image: collaborativedhs/semantic_framework:v2.0
         depends_on:
             - sf-kb
+            - dr-api
         ports:
             - '8087:8080'    
         volumes:
@@ -23,4 +31,6 @@ services:
             - 'KB_ADDRESS=jdbc:virtuoso://sf-kb:1111'
             - 'KB_ADDRESS_REPO=http://sf-kb:8890/'
             - 'KB_ADDRESS_RETRIEVE=http://sf-kb:8890/sparql'
-        
+            - 'DR_ADDRESS=http://dr-api:8080/DataReceiver/webresources/'
+   
+            

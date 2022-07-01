@@ -1,5 +1,5 @@
 {
-  "resultsPerPage": "2",
+  "resultsPerPage": "25",
   "sources": [
     {
       "dataSource": "https://catalogue.onda-dias.eu/dias-catalogue/Products?$search=%22footprint:%20%22Intersects(POINT([eventLat]%20[eventLong]))%22%20AND%20%20beginPosition:[[eventStartTime]T00:00:00.000Z%20TO%20[eventEndTime]T00:00:00.000Z]%20AND%20platformShortName:S1%20AND%20productType:IW_SLC__1S%22&$format=json",
@@ -35,7 +35,7 @@
       "dataSource": "https://data.seattle.gov/resource/kzjm-xkqj.json?$limit=[limit]&$offset=[offset]&$where=datetime%20between%20%27[SelectedDate]T00:00:00%27%20and%20%27[EndDate]T23:59:59%27&latitude=[CityLat]&longitude=[CityLong]",
       "username": "null",
       "password": "null",
-	  "additionalFields": ["incidentType", "eventId"],
+      "additionalFields": ["incidentType", "eventId"],
       "eventType": "firecall",
       "associatedId": "2"
     }

@@ -1,8 +1,9 @@
 {
     "client_secret": "xxx",
     "client_container_id": "xxx",
-	"URL": "http://<IP>:<PORT>/",
-	"realm": "xxx",
-	"adminUsername":"xxx",
-	"adminPassword":"xxx"
+    "client_name": "xxx",
+    "URL": "http://<IP>:<PORT>/",
+    "realm": "xxx",
+    "adminUsername":"xxx",
+    "adminPassword":"xxx"
 }

@@ -32,7 +32,7 @@
       "associatedId": "2"
     },
     {
-      "dataSource": "https://data.seattle.gov/resource/kzjm-xkqj.json?$limit=[limit]&$offset=[offset]&$where=datetime%20between%20%27[SelectedDate]T00:00:00%27%20and%20%27[EndDate]T23:59:59%27&latitude=[CityLat]&longitude=[CityLong]",
+      "dataSource": "https://data.seattle.gov/resource/kzjm-xkqj.json?$limit=[limit]&$offset=[offset]&$where=within_circle(report_location,%20[CityLat],%20[CityLong],%2050)%20and%20datetime%20between%20%27[SelectedDate]T00:00:00%27%20and%20%27[EndDate]T23:59:59%27",
       "username": "null",
       "password": "null",
 	  "additionalFields": ["incidentType", "eventId"],

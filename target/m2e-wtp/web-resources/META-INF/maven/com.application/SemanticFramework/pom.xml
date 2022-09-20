@@ -131,7 +131,17 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/virt_jena3.jar</systemPath>
 		</dependency>
-
+	<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>5.0.0-alpha.3</version>
+		</dependency>
+<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+<dependency>
+    <groupId>com.googlecode.json-simple</groupId>
+    <artifactId>json-simple</artifactId>
+    <version>1.1.1</version>
+</dependency>
 
 	</dependencies>
 	<properties>

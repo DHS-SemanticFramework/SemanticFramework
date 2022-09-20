@@ -16,6 +16,7 @@ import virtuoso.jena.driver.VirtModel;
 
 public class SemanticRepresentation {
 
+	// Semantic Representation of events information
 	public static Model eventsInitialization(String events, String uuid, String year, String month, String day,
 			String location, String city, String country) {
 		Model model = ModelFactory.createDefaultModel();
@@ -53,6 +54,7 @@ public class SemanticRepresentation {
 		return model;
 	}
 
+	// Semantic Representation of results containing both real-world events (i.e. earthquakes) and also Copernicus sentinel metadata
 	public static Model resultsMapping(JSONObject result, String uuid, Model model, ArrayList<String> copernicusSources,
 			String eventType, ArrayList<String> additionalFields) {
 

@@ -17,6 +17,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 public class LocationDetection {
+	// Generate RDF representation of the cities
 	public static Model preprocessing(Logger logger) {
 
 		try {
@@ -76,6 +77,7 @@ public class LocationDetection {
 		return null;
 	}
 
+	// Retrieve coordinates of the detected city, country
 	public static String retrieveLatLong(String city, String country, String service, Logger logger) {
 
 		String latitude = "null";

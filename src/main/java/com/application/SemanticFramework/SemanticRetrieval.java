@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 
 public class SemanticRetrieval {
 
+	// Retrieve the information that comply with the given criteria 
 	public static JsonArray retrieve(String uuid, ArrayList<String> copernicusSources, String service, Logger logger,
 			ArrayList<String> additionalFields) {
 

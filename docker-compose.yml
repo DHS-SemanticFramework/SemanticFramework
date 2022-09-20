@@ -18,7 +18,7 @@ services:
         volumes:
             - .:/logs       
     sf-api:
-        image: collaborativedhs/semantic_framework:v2.0
+        image: collaborativedhs/semantic_framework:v2.1
         depends_on:
             - sf-kb
             - dr-api
@@ -27,10 +27,10 @@ services:
         volumes:
             - ./config/configuration.json:/config/configuration.json
             - .:/logs
+            - ./config/keycloak_configuration.json:/config/keycloak_configuration.json
         environment:
             - 'KB_ADDRESS=jdbc:virtuoso://sf-kb:1111'
             - 'KB_ADDRESS_REPO=http://sf-kb:8890/'
             - 'KB_ADDRESS_RETRIEVE=http://sf-kb:8890/sparql'
-            - 'DR_ADDRESS=http://dr-api:8080/DataReceiver/webresources/'
-   
+            - 'DR_ADDRESS=http://dr-api:8080/DataReceiver/webresources/'   
             

@@ -6,8 +6,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.FileHandler;
@@ -15,16 +17,20 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -33,6 +39,11 @@ import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 @Path("/{task}")
 public class MyResource {
@@ -44,15 +55,15 @@ public class MyResource {
 	@Consumes(javax.ws.rs.core.MediaType.APPLICATION_JSON)
 	@Produces("text/plain")
 
-	public Response retrieval(@PathParam("task") String task, String object) {
+	public Response retrieval(@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization,
+			@PathParam("task") String task, String object) {
 
-		repository = System.getenv("KB_ADDRESS_REPO") + "SentinelRepo";
-		geoRepository = System.getenv("KB_ADDRESS_REPO") + "GeoRepo";
-
-		String kb_address_retrieve = System.getenv("KB_ADDRESS_RETRIEVE");
+		boolean has_search_role = false;
+		boolean has_sfmanager_role = false;
 
 		Logger logger = Logger.getLogger("MyLog");
 
+		// Log file initialization
 		FileHandler fh = null;
 		try {
 			File file = new File("/logs/logFile.log");
@@ -72,7 +83,168 @@ public class MyResource {
 			e.printStackTrace();
 		}
 
+		// Reading keycloak configuration
+		JSONParser parser = new JSONParser();
+		org.json.simple.JSONObject keycloak_json = new org.json.simple.JSONObject();
+		try {
+			keycloak_json = (org.json.simple.JSONObject) parser
+					.parse(new FileReader("/config/keycloak_configuration.json"));
+		} catch (FileNotFoundException e1) {
+			logger.severe("Exception:" + e1);
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			logger.severe("Exception:" + e1);
+			e1.printStackTrace();
+		} catch (ParseException e1) {
+			logger.severe("Exception:" + e1);
+			e1.printStackTrace();
+		}
+
+		String kc_address = keycloak_json.get("URL").toString();
+		String realm = keycloak_json.get("realm").toString();
+		String adminUsername = keycloak_json.get("adminUsername").toString();
+		String adminPassword = keycloak_json.get("adminPassword").toString();
+		// Check user authentication
+		if (authorization.length() > 0) {
+
+			byte[] decoded = Base64.getDecoder().decode(authorization.replace("Basic ", ""));
+			String decodedStr = new String(decoded, StandardCharsets.UTF_8);
+
+			String[] parts = decodedStr.split(":");
+			String username = parts[0];
+			String password = parts[1];
+
+			String userid = "null";
+			String token = "";
+			OkHttpClient client1 = new OkHttpClient().newBuilder().build();
+			MediaType mediaType1 = MediaType.parse("application/x-www-form-urlencoded");
+			RequestBody rbody1 = RequestBody.create(mediaType1,
+					"grant_type=password&client_id=sf-api&client_secret="
+							+ keycloak_json.get("client_secret").toString() + "&password=" + password + "&username="
+							+ username + "");
+			Request request1 = new Request.Builder()
+					.url(kc_address + "realms/" + realm + "/protocol/openid-connect/token").method("POST", rbody1)
+					.addHeader("Content-Type", "application/x-www-form-urlencoded").build();
+
+			okhttp3.Response response1;
+			try {
+				response1 = client1.newCall(request1).execute();
+				String respbody1 = response1.body().string();
+
+				JSONObject jresponse1 = new JSONObject(respbody1);
+
+				System.out.println(jresponse1);
+				logger.info("[Response]: " + jresponse1 + "\n");
+				if (jresponse1.has("error_description")) {
+
+					String resp = jresponse1.get("error_description") + ".";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", resp);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+
+				}
+				OkHttpClient client = new OkHttpClient().newBuilder().build();
+				MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+				RequestBody rbody = RequestBody.create(mediaType,
+						"grant_type=password&client_id=sf-api&client_secret="
+								+ keycloak_json.get("client_secret").toString() + "&password=" + adminPassword
+								+ "&username=" + adminUsername);
+				Request request = new Request.Builder()
+						.url(kc_address + "realms/" + realm + "/protocol/openid-connect/token").method("POST", rbody)
+						.addHeader("Content-Type", "application/x-www-form-urlencoded").build();
+				okhttp3.Response keycloakresponse;
+
+				keycloakresponse = client.newCall(request).execute();
+				String respbody = keycloakresponse.body().string();
+
+				System.out.println(respbody);
+				logger.info("[Response]: " + respbody + "\n");
+
+				JSONObject jresponse = new JSONObject(respbody);
+
+				token = jresponse.getString("access_token");
+
+				Unirest.setTimeouts(0, 0);
+				HttpResponse<String> response2 = Unirest.get(kc_address + "admin/realms/" + realm + "/users")
+						.header("Authorization", "Bearer " + token).asString();
+				JsonArray entry = new Gson().fromJson(response2.getBody(), JsonArray.class);
+
+				boolean found = false;
+				for (int i = 0; i < entry.size(); i++) {
+
+					if (username.equals(entry.get(i).getAsJsonObject().get("username").getAsString())) {
+
+						found = true;
+						userid = entry.get(i).getAsJsonObject().get("id").getAsString();
+					}
+				}
+				if (!found) {
+
+					String resp = "No user found for username '" + username + "'. ";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", resp);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+
+				}
+				Unirest.setTimeouts(0, 0);
+				HttpResponse<String> response3 = Unirest
+						.get(kc_address + "admin/realms/" + realm + "/users/" + userid + "/role-mappings/clients/"
+								+ keycloak_json.get("client_container_id").toString())
+						.header("Authorization", "Bearer " + token).asString();
+				logger.info("[Response]: " + response3 + "\n");
+
+				JsonArray role = new Gson().fromJson(response3.getBody(), JsonArray.class);
+
+				for (int i = 0; i < role.size(); i++) {
+
+					if (role.get(i).getAsJsonObject().get("name").getAsString().equals("Search")) {
+
+						has_search_role = true;
+					}
+					if (role.get(i).getAsJsonObject().get("name").getAsString().equals("Semantic Framework Manager")) {
+
+						has_sfmanager_role = true;
+					}
+
+				}
+
+			} catch (IOException e2) {
+				logger.severe("Exception:" + e2);
+				e2.printStackTrace();
+			} catch (UnirestException e) {
+				logger.severe("Exception:" + e);
+				e.printStackTrace();
+			}
+
+		} else {
+			String resp = "Basic authentication is required.";
+			JsonObject error = new JsonObject();
+			error.addProperty("error", resp);
+			logger.info("[Response code]: 200, [Response]: " + error + "\n");
+			fh.close();
+			return Response.status(200).entity(error.toString()).build();
+		}
+
+		repository = System.getenv("KB_ADDRESS_REPO") + "SentinelRepo";
+		geoRepository = System.getenv("KB_ADDRESS_REPO") + "GeoRepo";
+
+		String kb_address_retrieve = System.getenv("KB_ADDRESS_RETRIEVE");
+
 		if (task.equals("retrieve")) {
+			if (!has_search_role) {
+				String resp = "The user has no assigned 'Search' role.";
+				JsonObject error = new JsonObject();
+				error.addProperty("error", resp);
+				logger.info("[Response code]: 401, [Response]: " + error + "\n");
+				fh.close();
+				return Response.status(401).entity(error.toString()).build();
+
+			}
+
 			String kb_address = System.getenv("KB_ADDRESS");
 			String response;
 			Gson gson = new Gson();
@@ -105,6 +277,8 @@ public class MyResource {
 			String eventSource = "", eventUsername = "", eventPassword = "", associatedId = "";
 			String eventType = input.split(" ")[0];
 			String resultsperpage = conf.getAsJsonObject().get("resultsPerPage").getAsString();
+			// Matching event type with the corresponding Copernicus data sources and
+			// products
 			for (int i = 0; i < conf.getAsJsonObject().get("sources").getAsJsonArray().size(); i++) {
 
 				if (conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject().has("eventType")) {
@@ -169,6 +343,7 @@ public class MyResource {
 
 			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
 
+			// Keyword understanding and error handling
 			if (input.startsWith("earthquake located in ")) {
 				String parsed = input;
 				parsed = parsed.replace("earthquake located in ", "");
@@ -2327,9 +2502,9 @@ public class MyResource {
 					// Calling location detection
 					String latLong = LocationDetection.retrieveLatLong(city, country, kb_address_retrieve, logger);
 
-					String[] parts = latLong.split(":");
-					latitude = parts[0];
-					longitude = parts[1];
+					String[] locparts = latLong.split(":");
+					latitude = locparts[0];
+					longitude = locparts[1];
 					if (latitude.equals("null") || longitude.equals("null")) {
 						response = "Location not found. Please make sure to add a valid city and country name.";
 						JsonObject error = new JsonObject();
@@ -2366,7 +2541,7 @@ public class MyResource {
 			jobj.put("year", year);
 			jobj.put("month", month);
 			jobj.put("day", day);
-			
+
 			jobj.put("source", eventSource);
 			jobj.put("username", eventUsername);
 			jobj.put("password", eventPassword);
@@ -2379,14 +2554,14 @@ public class MyResource {
 			JSONArray translatedEvents = null;
 			String dr_address = System.getenv("DR_ADDRESS");
 			try {
-				
+				// Calling Data Receiver for non-earthquake events (generic use case)
 				if (!input.startsWith("earthquake")) {
 					eresponse = Unirest.post(dr_address + "event-" + eventType)
 							.header("Content-Type", "application/json").body(jobj).asString();
 					System.out.println("[Data Receiver request status]" + eresponse.getStatus());
 					System.out.println("[Data Receiver request response]" + eresponse.getBody());
 					translatedEvents = new JSONArray(eresponse.getBody().toString());
-				} else {
+				} else { // Calling Data Receiver for earthquake events
 					jobj.put("magnitude", magnitude);
 					eresponse = Unirest.post(dr_address + "earthquake").header("Content-Type", "application/json")
 							.body(jobj).asString();
@@ -2425,7 +2600,7 @@ public class MyResource {
 					pobj.put("address", copernicusAddresses.get(j));
 
 					try {
-
+						// Calling Data Receiver for sentinel products
 						presponse = Unirest.post(dr_address + "product").header("Content-Type", "application/json")
 								.body(pobj).asString();
 						System.out.println("[Data Receiver request status]" + presponse.getStatus());
@@ -2452,6 +2627,17 @@ public class MyResource {
 			CleaningKB.delete(uuid, kb_address, repository);
 			return Response.status(200).entity(String.valueOf(results)).build();
 		} else if (task.equals("population")) {
+			// Only users with Semantic Framework Manager role are able to fire population
+			if (!has_sfmanager_role) {
+				String resp = "The user has no assigned 'Semantic Framework Manager' role.";
+				JsonObject error = new JsonObject();
+				error.addProperty("error", resp);
+				logger.info("[Response code]: 401, [Response]: " + error + "\n");
+				fh.close();
+				return Response.status(401).entity(error.toString()).build();
+			}
+			// Semantic representation and storage of location-related information (this
+			// procedure should be done only once on the initial setup of the framework)
 			String kb_address = System.getenv("KB_ADDRESS");
 
 			Model geoModel = ModelFactory.createDefaultModel();
@@ -2465,6 +2651,7 @@ public class MyResource {
 			return Response.status(200).entity(status.toString()).build();
 
 		}
+
 		JsonObject error = new JsonObject();
 		error.addProperty("error", "Unexpected parameter {task}. Was expecting one of 'population' or 'retrieve'.");
 		logger.info("[Response code]: 200, [Response]: " + error.toString() + "\n");

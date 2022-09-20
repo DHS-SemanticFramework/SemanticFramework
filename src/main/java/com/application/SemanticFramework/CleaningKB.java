@@ -8,6 +8,7 @@ import virtuoso.jena.driver.VirtuosoUpdateRequest;
 
 public class CleaningKB {
 
+	// KB optimization: cleaning data of the request that is about to be replied
 	public static void delete(String uuid, String kb_address, String repository) {
 
 	String query = "prefix event:<http://purl.org/NET/c4dm/event.owl#>\r\n" + 

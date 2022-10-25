@@ -105,12 +105,22 @@ public class MyResource {
 		String client_name = keycloak_json.get("client_name").toString();
 		String adminUsername = keycloak_json.get("adminUsername").toString();
 		String adminPassword = keycloak_json.get("adminPassword").toString();
+		
+		
 		// Check user authentication
 		if (authorization.length() > 0) {
 
 			byte[] decoded = Base64.getDecoder().decode(authorization.replace("Basic ", ""));
 			String decodedStr = new String(decoded, StandardCharsets.UTF_8);
 
+			if(decodedStr.length()<3) {
+				String response = "Invalid user credentials.";
+				JsonObject error = new JsonObject();
+				error.addProperty("error", response);
+				logger.info("[Response code]: 200, [Response]: " + error + "\n");
+				fh.close();
+				return Response.status(200).entity(error.toString()).build();
+			}
 			String[] parts = decodedStr.split(":");
 			String username = parts[0];
 			String password = parts[1];

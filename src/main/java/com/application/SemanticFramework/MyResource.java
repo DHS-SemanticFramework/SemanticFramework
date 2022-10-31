@@ -105,15 +105,23 @@ public class MyResource {
 		String client_name = keycloak_json.get("client_name").toString();
 		String adminUsername = keycloak_json.get("adminUsername").toString();
 		String adminPassword = keycloak_json.get("adminPassword").toString();
-		
-		
+
+		if (authorization == null) {
+
+			String resp = "Basic authentication is required.";
+			JsonObject error = new JsonObject();
+			error.addProperty("error", resp);
+			logger.info("[Response code]: 200, [Response]: " + error + "\n");
+			fh.close();
+			return Response.status(200).entity(error.toString()).build();
+		}
 		// Check user authentication
 		if (authorization.length() > 0) {
 
 			byte[] decoded = Base64.getDecoder().decode(authorization.replace("Basic ", ""));
 			String decodedStr = new String(decoded, StandardCharsets.UTF_8);
 
-			if(decodedStr.length()<3) {
+			if (decodedStr.length() < 3) {
 				String response = "Invalid user credentials.";
 				JsonObject error = new JsonObject();
 				error.addProperty("error", response);
@@ -130,7 +138,7 @@ public class MyResource {
 			OkHttpClient client1 = new OkHttpClient().newBuilder().build();
 			MediaType mediaType1 = MediaType.parse("application/x-www-form-urlencoded");
 			RequestBody rbody1 = RequestBody.create(mediaType1,
-					"grant_type=password&client_id="+client_name+"&client_secret="
+					"grant_type=password&client_id=" + client_name + "&client_secret="
 							+ keycloak_json.get("client_secret").toString() + "&password=" + password + "&username="
 							+ username + "");
 			Request request1 = new Request.Builder()
@@ -159,7 +167,7 @@ public class MyResource {
 				OkHttpClient client = new OkHttpClient().newBuilder().build();
 				MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
 				RequestBody rbody = RequestBody.create(mediaType,
-						"grant_type=password&client_id="+client_name+"&client_secret="
+						"grant_type=password&client_id=" + client_name + "&client_secret="
 								+ keycloak_json.get("client_secret").toString() + "&password=" + adminPassword
 								+ "&username=" + adminUsername);
 				Request request = new Request.Builder()

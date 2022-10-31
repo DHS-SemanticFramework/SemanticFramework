@@ -18,7 +18,7 @@ services:
         volumes:
             - .:/logs       
     sf-api:
-        image: collaborativedhs/semantic_framework:v2.2
+        image: collaborativedhs/semantic_framework:v2.3
         depends_on:
             - sf-kb
             - dr-api

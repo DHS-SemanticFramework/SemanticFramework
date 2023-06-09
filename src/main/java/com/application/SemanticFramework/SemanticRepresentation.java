@@ -7,12 +7,60 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.IOException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.json.JSONObject;
 
 import virtuoso.jena.driver.VirtModel;
+
+
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class SemanticRepresentation {
 
@@ -56,10 +104,9 @@ public class SemanticRepresentation {
 
 	// Semantic Representation of results containing both real-world events (i.e. earthquakes) and also Copernicus sentinel metadata
 	public static Model resultsMapping(JSONObject result, String uuid, Model model, ArrayList<String> copernicusSources,
-			String eventType, ArrayList<String> additionalFields) {
+			String eventType, ArrayList<String> additionalFields) throws IOException{
 
 		String uuid2 = UUID.randomUUID().toString().replaceAll("-", "");
-
 		String event_instance = Prefixes.event + "Event_" + uuid;
 		String eventType_instance = Prefixes.event + StringUtils.capitalize(eventType) + "Event_" + uuid2;
 		model.add(model.createResource(event_instance), model.createProperty(Prefixes.event + "hasSubEvent"),
@@ -92,10 +139,19 @@ public class SemanticRepresentation {
 						result.getJSONObject("event").getString("timestamp").length() - 4) + "Z");
 
 		for (int j = 0; j < copernicusSources.size(); j++) {
-
+			
 			for (int i = 0; i < result.getJSONArray(copernicusSources.get(j)).length(); i++) {
 				uuid2 = UUID.randomUUID().toString().replaceAll("-", "");
 				String product_instance = Prefixes.event + "Product_" + uuid2;
+				System.out.println("This is needed: " + result.getJSONArray(copernicusSources.get(j)).getJSONObject(i));
+				String uuidOrbit = result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL").toString().replace("https://catalogue.onda-dias.eu/dias-catalogue/Products(", "").replace(")", "").replace(" ", "");// parse this to get the id and give to the function below to retrieve orbit and pass
+				System.out.println("The uuid: " + uuidOrbit);
+				System.out.println("The URL of the product: " + uuidOrbit);
+
+        		List<String> infoNames = Arrays.asList("relativeorbitnumber", "orbitdirection");
+        		List<String> results = getProductInfo(uuidOrbit, infoNames);
+        		System.out.println("The orbit number: " + results.get(0));
+				System.out.println("The orbit number: " + results.get(1));
 
 				model.add(model.createResource(eventType_instance), model.createProperty(Prefixes.event + "product"),
 						model.createResource(product_instance));
@@ -112,7 +168,10 @@ public class SemanticRepresentation {
 						result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL"));
 				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "source"),
 						copernicusSources.get(j));
-
+				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasOrbit"),
+						results.get(0).toString());
+				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasPassDirection"),
+						results.get(1).toString());
 			}
 		}
 
@@ -128,4 +187,78 @@ public class SemanticRepresentation {
 		virtualModel.commit();
 		virtualModel.close();
 	}
+
+
+	//     private static List<String> getProductInfo(String productUUID, List<String> infoNames) throws IOException {
+    //     String baseUrl = "https://colhub.copernicus.eu/dhus/search?q=uuid:" + productUUID + "&format=json";
+    //     URL url = new URL(baseUrl);
+    //     HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    //     con.setRequestMethod("GET");
+    //     con.setRequestProperty("Content-Type", "application/json");
+
+    //     int responseCode = con.getResponseCode();
+    //     if (responseCode == HttpURLConnection.HTTP_OK) {
+    //         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+    //         String inputLine;
+    //         StringBuilder response = new StringBuilder();
+    //         while ((inputLine = in.readLine()) != null) {
+    //             response.append(inputLine);
+    //         }
+    //         in.close();
+
+    //         List<String> results = new ArrayList<String>();
+    //         for (String infoName : infoNames) {
+    //             String infoPatternString = "\"name\":\"" + infoName + "\",\"content\":\"([^\"]+)\"";
+    //             Pattern infoPattern = Pattern.compile(infoPatternString);
+    //             Matcher infoMatcher = infoPattern.matcher(response.toString());
+    //             if (infoMatcher.find()) {
+    //                 String infoValue = infoMatcher.group(1);
+    //                 results.add(infoValue);
+    //             }
+    //         }
+    //         return results;
+    //     } else {
+    //         System.out.println("Error: " + responseCode);
+    //         return null;
+    //     }
+    // }
+
+    private static List<String> getProductInfo(String productUUID, List<String> infoNames) throws IOException {
+    String baseUrl = "https://colhub.copernicus.eu/dhus/search?q=uuid:" + productUUID + "&format=json";
+    System.out.println(baseUrl);
+    URL url = new URL(baseUrl);
+    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    con.setRequestMethod("GET");
+    con.setRequestProperty("Content-Type", "application/json");
+
+    // Add authentication credentials to request
+    String encodedCredentials = Base64.getEncoder().encodeToString(("ivvuser:password").getBytes());
+    con.setRequestProperty("Authorization", "Basic " + encodedCredentials);
+
+    int responseCode = con.getResponseCode();
+    if (responseCode == HttpURLConnection.HTTP_OK) {
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        List<String> results = new ArrayList<String>();
+        for (String infoName : infoNames) {
+            String infoPatternString = "\"name\":\"" + infoName + "\",\"content\":\"([^\"]+)\"";
+            Pattern infoPattern = Pattern.compile(infoPatternString);
+            Matcher infoMatcher = infoPattern.matcher(response.toString());
+            if (infoMatcher.find()) {
+                String infoValue = infoMatcher.group(1);
+                results.add(infoValue);
+            }
+        }
+        return results;
+    } else {
+        System.out.println("Error: " + responseCode);
+        return null;
+    }
+}
 }

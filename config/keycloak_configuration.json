@@ -1,9 +1,9 @@
 {
-    "client_secret": "xxx",
-    "client_container_id": "xxx",
-    "client_name": "xxx",
-    "URL": "http://<IP>:<PORT>/",
-    "realm": "xxx",
-    "adminUsername":"xxx",
-    "adminPassword":"xxx"
+    "client_secret": "0qx9qT4yU0a63MgZ4IxWpV1u0n99C0RV",
+    "client_container_id": "22203fed-9190-42ae-84df-557e5f15b818",
+    "client_name": "sf-api",
+    "URL": "http://192.168.65.2:8081/",
+    "realm": "master",
+    "adminUsername":"user",
+    "adminPassword":"bitnami"
 }

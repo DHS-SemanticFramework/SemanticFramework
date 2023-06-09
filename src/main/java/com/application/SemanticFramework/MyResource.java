@@ -1,6 +1,7 @@
 
 package com.application.SemanticFramework;
-
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,6 +41,14 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.IOException;
+
+import java.net.*;
+import java.io.*;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -56,7 +65,7 @@ public class MyResource {
 	@Produces("text/plain")
 
 	public Response retrieval(@HeaderParam(HttpHeaders.AUTHORIZATION) String authorization,
-			@PathParam("task") String task, String object) {
+			@PathParam("task") String task, String object) throws IOException{
 
 		boolean has_search_role = false;
 		boolean has_sfmanager_role = false;
@@ -270,7 +279,77 @@ public class MyResource {
 
 			JsonElement json = gson.fromJson(object, JsonElement.class);
 			JsonObject jobject = json.getAsJsonObject();
-			String input = jobject.get("text").getAsString();
+
+
+			//Some processing to get the input from Valadis
+			String inputText = "";
+			try{
+				JsonObject jobjectNLP = jobject.get("nlp").getAsJsonObject();
+				System.out.println("NLPjson:" + jobject.get("nlp"));
+				inputText = jobjectNLP.get("event").toString().replace("\"", "") + " located in ";
+				
+				if (jobjectNLP.get("point").toString().replace("\"", "").equals("false")){
+
+				if (!jobjectNLP.get("city").toString().replace("\"", "").equals("null")){
+					if(!jobjectNLP.get("country").toString().replace("\"", "").equals("null")){
+					inputText = inputText + jobjectNLP.get("city").toString().replace("\"", "") + ", " + jobjectNLP.get("country").toString().replace("\"", "");
+				}
+				}
+				if (jobjectNLP.get("country").toString().replace("\"", "").equals("null")) {
+					if (!jobjectNLP.get("city").toString().replace("\"", "").equals("null")){
+					inputText = inputText + jobjectNLP.get("city").toString().replace("\"", "");
+				}
+				} 
+				if (!jobjectNLP.get("country").toString().replace("\"", "").equals("null")) {
+					if(jobjectNLP.get("city").toString().replace("\"", "").equals("null")){
+					inputText = inputText + jobjectNLP.get("country").toString().replace("\"", "");
+					}
+				}
+
+				}
+				else{
+					inputText = inputText + "POINT (" + jobjectNLP.get("latitude").toString().replace("\"", "")
+					+ " " +  jobjectNLP.get("lognitude").toString().replace("\"", "") + ")";
+				}
+
+				if (!jobjectNLP.get("year").toString().replace("\"", "").equals("null")) {
+					inputText = inputText + " in " + jobjectNLP.get("year").toString().replace("\"", "");
+				}
+				if (!jobjectNLP.get("month").toString().replace("\"", "").equals("null")) {
+					if (jobjectNLP.get("month").toString().replace("\"", "").length() > 1){
+					inputText = inputText + " " + jobjectNLP.get("month").toString().replace("\"", "");
+					}
+					else{
+						inputText = inputText + " 0" + jobjectNLP.get("month").toString().replace("\"", "");
+					}
+				}
+				if (!jobjectNLP.get("day").toString().replace("\"", "").equals("null")) {
+					if (jobjectNLP.get("day").toString().replace("\"", "").length() > 1){
+					inputText = inputText + " " + jobjectNLP.get("day").toString().replace("\"", "");
+					}
+					else{
+						inputText = inputText + " 0" + jobjectNLP.get("day").toString().replace("\"", "");
+					}
+				}
+				if (!jobjectNLP.get("magnitude").toString().replace("\"", "").equals("null")) {
+					if (jobjectNLP.get("comparative").toString().replace("\"", "").equals(">=") || jobjectNLP.get("comparative").toString().replace("\"", "").equals(">")){
+						inputText = inputText + " with magnitude greater than " + jobjectNLP.get("magnitude").toString().replace("\"", "");
+					}
+					else if (jobjectNLP.get("comparative").toString().replace("\"", "").equals("=")){
+						inputText = inputText + " with magnitude " + jobjectNLP.get("magnitude").toString().replace("\"", "");
+					}
+					else if (jobjectNLP.get("comparative").toString().replace("\"", "").equals("<=") || jobjectNLP.get("comparative").toString().replace("\"", "").equals("<")){
+						inputText = inputText + " with magnitude less than " + jobjectNLP.get("magnitude").toString().replace("\"", "");
+					}
+				}
+				System.out.println("Current text: " + inputText);
+			}
+			catch (Exception e) {
+				System.out.println("Some error sry Alex");
+			}
+			//
+			//String input = jobject.get("text").getAsString();
+			String input = inputText;
 			String pagenumber = jobject.get("page").getAsString();
 
 			String city = "null", country = "null", year = "null", month = "null", day = "null", magnitude = "5.0";
@@ -282,6 +361,7 @@ public class MyResource {
 			try {
 				bufferedReader = new BufferedReader(new FileReader(path));
 				conf = gson.fromJson(bufferedReader, JsonElement.class);
+				System.out.println("The conf: " + conf);
 			} catch (FileNotFoundException e) {
 
 				logger.severe("Exception:" + e);
@@ -303,11 +383,13 @@ public class MyResource {
 				if (conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject().has("eventType")) {
 					JsonObject obj = new JsonObject();
 					obj = conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject();
+					System.out.println("Object json: " + obj);
 					if (input.startsWith(obj.get("eventType").getAsString())) {
 						eventSource = obj.get("dataSource").getAsString();
 						eventUsername = obj.get("username").getAsString();
 						eventPassword = obj.get("password").getAsString();
 						associatedId = obj.get("associatedId").getAsString();
+
 						if (obj.has("additionalFields")) {
 							JsonArray additional = obj.get("additionalFields").getAsJsonArray();
 
@@ -361,6 +443,142 @@ public class MyResource {
 			}
 
 			String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+			//New errors by NLP
+			JsonObject jobjectNLPerror = jobject.get("nlp").getAsJsonObject();
+			if (jobjectNLPerror.get("magnitude").toString().replace("\"", "").equals("9999912")) {
+					response = "The query contains more than one magnitude references";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("magnitude").toString().replace("\"", "").equals("9999913")) {
+					response = "Unexpected error related to magnitude input";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("magnitude").toString().replace("\"", "").equals("9999914")) {
+					response = "Magnitude format error: decimal separator should be a point (e.g. 6.2)";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+
+			if (jobjectNLPerror.get("event").toString().replace("\"", "").equals("9999921")) {
+					response = "The query does not refer to an earthquake event";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("event").toString().replace("\"", "").equals("9999922")) {
+					response = "Unexpected error related to earthquake event relatedness";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+
+			if (jobjectNLPerror.get("comparative").toString().replace("\"", "").equals("9999951")) {
+					response = "The query contains more than one comparative adjective (>, <, =, >=, <=)";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("comparative").toString().replace("\"", "").equals("9999953")) {
+					response = "The query contains more than symbol comparative adjective";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("comparative").toString().replace("\"", "").equals("9999954")) {
+					response = "Unexpected error related to the comparative adjective input";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+
+
+			if (jobjectNLPerror.get("year").toString().replace("\"", "").equals("9999931")) {
+					response = "The query contains a date in a wrong format	(year)";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("year").toString().replace("\"", "").equals("9999932")) {
+					response = "No date reference in the query: year is mandatory (e.g. 2018)";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("year").toString().replace("\"", "").equals("9999933")) {
+					response = "The query contains more than one date references";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("year").toString().replace("\"", "").equals("9999934")) {
+					response = "Unexpected error related to date reference input";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+
+
+			if (jobjectNLPerror.get("city").toString().replace("\"", "").equals("9999941") && jobjectNLPerror.get("country").toString().replace("\"", "").equals("9999941")) {
+					response = "No event location reference in the query: country is mandatory (e.g. Italy)";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("city").toString().replace("\"", "").equals("9999942") && jobjectNLPerror.get("country").toString().replace("\"", "").equals("9999942")) {
+					response = "The query contains more than one city or country";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("city").toString().replace("\"", "").equals("9999943") && jobjectNLPerror.get("country").toString().replace("\"", "").equals("9999943")) {
+					response = "The query contains more than one country";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+			else if (jobjectNLPerror.get("city").toString().replace("\"", "").equals("9999944") && jobjectNLPerror.get("country").toString().replace("\"", "").equals("9999944")) {
+					response = "Unexpected error related to country or city references";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
 
 			// Keyword understanding and error handling
 			if (input.startsWith("earthquake located in ")) {
@@ -2567,7 +2785,7 @@ public class MyResource {
 
 			jobj.put("pageNumber", pagenumber);
 			jobj.put("resultsPerPage", resultsperpage);
-
+			System.out.println("Hey look at this event: " + jobj);
 			Unirest.setTimeouts(0, 0);
 			HttpResponse<String> eresponse;
 			JSONArray translatedEvents = null;
@@ -2587,6 +2805,7 @@ public class MyResource {
 					System.out.println("[Data Receiver request status]" + eresponse.getStatus());
 					System.out.println("[Data Receiver request response]" + eresponse.getBody());
 					translatedEvents = new JSONArray(eresponse.getBody().toString());
+					
 				}
 			} catch (UnirestException e) {
 				e.printStackTrace();
@@ -2605,7 +2824,6 @@ public class MyResource {
 				for (int j = 0; j < copernicusSources.size(); j++) {
 
 					source = copernicusSources.get(j);
-
 					Unirest.setTimeouts(0, 0);
 					HttpResponse<String> presponse;
 					JSONArray translatedProducts = null;
@@ -2613,28 +2831,42 @@ public class MyResource {
 					pobj.put("eventDate", translatedEvents.getJSONObject(i).getString("timestamp"));
 					pobj.put("eventLat", translatedEvents.getJSONObject(i).getString("latitude"));
 					pobj.put("eventLong", translatedEvents.getJSONObject(i).getString("longitude"));
+					//pobj.put("source", copernicusSources.get(j).replace("&format=json", "&fl=name,beginposition,endposition,orbitnumber,orbitdirection,polarisationmode,producttype&orderby=beginposition%20desc&format=json"));
 					pobj.put("source", copernicusSources.get(j));
+					
 					pobj.put("username", copernicusUsername.get(j));
 					pobj.put("password", copernicusPassword.get(j));
 					pobj.put("address", copernicusAddresses.get(j));
-
+					System.out.println("Hey look at this product: " + pobj);
+					System.out.println("Product without orbit number: " + copernicusSources.get(j).toString());
+					System.out.println("Product with orbit number: " + copernicusSources.get(j).toString().replace("&format=json", "&fl=name,beginposition,endposition,orbitnumber,orbitdirection,polarisationmode,producttype&orderby=beginposition%20desc&format=json"));
+					
 					try {
 						// Calling Data Receiver for sentinel products
 						presponse = Unirest.post(dr_address + "product").header("Content-Type", "application/json")
 								.body(pobj).asString();
+						
 						System.out.println("[Data Receiver request status]" + presponse.getStatus());
 						System.out.println("[Data Receiver request response]" + presponse.getBody());
 						translatedProducts = new JSONArray(presponse.getBody().toString());
+
 					} catch (UnirestException e) {
 
 						e.printStackTrace();
 					}
 					result.put(source, translatedProducts);
-
+					System.out.println("The translated product: " + translatedProducts);
 				}
+
 				model = SemanticRepresentation.resultsMapping(result, uuid, model, copernicusSources, eventType,
 						additionalFields);
 
+				// System.out.println("The results: " + result);
+				// System.out.println("The uuid: " + uuid);
+				// System.out.println("The model: " + model);
+				// System.out.println("The copernicusSources: " + copernicusSources);
+				// System.out.println("The eventType: " + eventType);
+				// System.out.println("The additionalFields: " + additionalFields);
 			}
 			SemanticRepresentation.storeModel(model, kb_address, repository);
 
@@ -2658,10 +2890,13 @@ public class MyResource {
 			// Semantic representation and storage of location-related information (this
 			// procedure should be done only once on the initial setup of the framework)
 			String kb_address = System.getenv("KB_ADDRESS");
-
+			System.out.println("Hi Alex 0");
 			Model geoModel = ModelFactory.createDefaultModel();
+			System.out.println("Hi Alex 1");
 			geoModel = LocationDetection.preprocessing(logger);
-
+			System.out.println("Hi Alex 2");
+			System.out.println("The geo model: " + geoModel);
+			System.out.println("The geo repository: " + geoRepository);
 			SemanticRepresentation.storeModel(geoModel, kb_address, geoRepository);
 			JsonObject status = new JsonObject();
 			status.addProperty("status", "Successfully added to KB.");
@@ -2678,6 +2913,8 @@ public class MyResource {
 		return Response.status(200).entity(error.toString()).build();
 
 	}
+
+
 
 	public static boolean isInteger(String s) {
 		try {

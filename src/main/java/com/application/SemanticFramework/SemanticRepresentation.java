@@ -141,17 +141,55 @@ public class SemanticRepresentation {
 		for (int j = 0; j < copernicusSources.size(); j++) {
 			
 			for (int i = 0; i < result.getJSONArray(copernicusSources.get(j)).length(); i++) {
-				uuid2 = UUID.randomUUID().toString().replaceAll("-", "");
-				String product_instance = Prefixes.event + "Product_" + uuid2;
-				System.out.println("This is needed: " + result.getJSONArray(copernicusSources.get(j)).getJSONObject(i));
-				String uuidOrbit = result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL").toString().replace("https://catalogue.onda-dias.eu/dias-catalogue/Products(", "").replace(")", "").replace(" ", "");// parse this to get the id and give to the function below to retrieve orbit and pass
-				System.out.println("The uuid: " + uuidOrbit);
-				System.out.println("The URL of the product: " + uuidOrbit);
 
-        		List<String> infoNames = Arrays.asList("relativeorbitnumber", "orbitdirection");
-        		List<String> results = getProductInfo(uuidOrbit, infoNames);
-        		System.out.println("The orbit number: " + results.get(0));
-				System.out.println("The orbit number: " + results.get(1));
+				uuid2 = UUID.randomUUID().toString().replaceAll("-", "");
+                String product_instance = Prefixes.event + "Product_" + uuid2;
+                System.out.println("This is needed: " + result.getJSONArray(copernicusSources.get(j)).getJSONObject(i));
+                String uuidOrbit = result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("id").toString();//.replace("https://catalogue.onda-dias.eu/dias-catalogue/Products(", "").replace(")", "").replace(" ", "");// parse this to get the id and give to the function below to retrieve orbit and pass
+                System.out.println("The uuid: " + uuidOrbit);
+                System.out.println("The URL of the product: " + uuidOrbit);
+                Integer flagException = 0;
+				
+				try{
+	        		List<String> infoNames = Arrays.asList("relativeorbitnumber", "orbitdirection");
+	        		List<String> results = getProductInfo(uuidOrbit, infoNames);
+	        		System.out.println("The orbit number: " + results.get(0));
+					System.out.println("The pass direction: " + results.get(2));
+					System.out.println("The url: " + results.get(1));
+					
+					model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "productURL"),
+							result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL"));
+					model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "source"),
+							copernicusSources.get(j));
+					model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasOrbit"),
+							results.get(0).toString());
+					model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasPassDirection"),
+							results.get(2).toString());
+				} catch (Exception  e) {
+					flagException = 1;
+				    System.out.println("I could not find information about this product: " + uuidOrbit + ". I will look in Onda Dias.");
+				}
+
+				if (flagException == 1){
+					try{
+	        			List<String> infoNames = Arrays.asList("relativeorbitnumber", "orbitdirection");
+	        			List<String> results = getProductInfo2nd(uuidOrbit, infoNames);
+	        			System.out.println("The orbit number: " + results.get(0));
+						System.out.println("The pass direction: " + results.get(2));
+						System.out.println("The url: " + results.get(1));
+
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "productURL"),
+								result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL"));
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "source"),
+								copernicusSources.get(j));
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasOrbit"),
+								results.get(0).toString());
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasPassDirection"),
+								results.get(2).toString());
+					} catch (Exception  e) {
+						System.out.println("Orbit and Pass Direction do not exist from this data source");
+					}
+				}
 
 				model.add(model.createResource(eventType_instance), model.createProperty(Prefixes.event + "product"),
 						model.createResource(product_instance));
@@ -164,14 +202,7 @@ public class SemanticRepresentation {
 						result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("location"));
 				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasId"),
 						result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("id"));
-				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "productURL"),
-						result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL"));
-				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "source"),
-						copernicusSources.get(j));
-				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasOrbit"),
-						results.get(0).toString());
-				model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasPassDirection"),
-						results.get(1).toString());
+				
 			}
 		}
 
@@ -188,51 +219,49 @@ public class SemanticRepresentation {
 		virtualModel.close();
 	}
 
-
-	//     private static List<String> getProductInfo(String productUUID, List<String> infoNames) throws IOException {
-    //     String baseUrl = "https://colhub.copernicus.eu/dhus/search?q=uuid:" + productUUID + "&format=json";
-    //     URL url = new URL(baseUrl);
-    //     HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    //     con.setRequestMethod("GET");
-    //     con.setRequestProperty("Content-Type", "application/json");
-
-    //     int responseCode = con.getResponseCode();
-    //     if (responseCode == HttpURLConnection.HTTP_OK) {
-    //         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-    //         String inputLine;
-    //         StringBuilder response = new StringBuilder();
-    //         while ((inputLine = in.readLine()) != null) {
-    //             response.append(inputLine);
-    //         }
-    //         in.close();
-
-    //         List<String> results = new ArrayList<String>();
-    //         for (String infoName : infoNames) {
-    //             String infoPatternString = "\"name\":\"" + infoName + "\",\"content\":\"([^\"]+)\"";
-    //             Pattern infoPattern = Pattern.compile(infoPatternString);
-    //             Matcher infoMatcher = infoPattern.matcher(response.toString());
-    //             if (infoMatcher.find()) {
-    //                 String infoValue = infoMatcher.group(1);
-    //                 results.add(infoValue);
-    //             }
-    //         }
-    //         return results;
-    //     } else {
-    //         System.out.println("Error: " + responseCode);
-    //         return null;
-    //     }
-    // }
-
     private static List<String> getProductInfo(String productUUID, List<String> infoNames) throws IOException {
-    String baseUrl = "https://colhub.copernicus.eu/dhus/search?q=uuid:" + productUUID + "&format=json";
-    System.out.println(baseUrl);
-    URL url = new URL(baseUrl);
+		String path = "/config/configuration.json";
+		BufferedReader bufferedReader;
+		JsonElement conf = null;
+
+		String username = "";
+		String password = "";
+		String baseURLNEW = "";
+		try {
+		    bufferedReader = new BufferedReader(new FileReader(path));
+		    Gson gson = new Gson();
+		    conf = gson.fromJson(bufferedReader, JsonElement.class);
+		    for (int i = 0; i <
+				conf.getAsJsonObject().get("sources").getAsJsonArray().size(); i++) {
+
+    			 if
+				 (conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject().has("type"))
+				{
+					 if(conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject().get("type").toString().replace("\"", "").equals("orbitPass"))
+       					{
+   						 	 JsonObject obj = new JsonObject();
+    					 	 obj = conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject();
+    					 	 username = obj.get("username").toString();
+    					 	 password = obj.get("password").toString();
+    					 	 baseURLNEW = obj.get("dataSource").toString();
+        				}
+        		}
+        	}		 
+
+		} catch (FileNotFoundException e) {
+		    e.printStackTrace();
+		}
+					 
+    
+    URL url = new URL(baseURLNEW.replace("[productUUID]", productUUID.toString()).replace("\"", ""));
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
     con.setRequestProperty("Content-Type", "application/json");
 
     // Add authentication credentials to request
-    String encodedCredentials = Base64.getEncoder().encodeToString(("ivvuser:password").getBytes());
+    String authHelper = username.replace("\"","") + ":" + password.replace("\"","");
+    String encodedCredentials = Base64.getEncoder().encodeToString((authHelper).getBytes());
+    
     con.setRequestProperty("Authorization", "Basic " + encodedCredentials);
 
     int responseCode = con.getResponseCode();
@@ -253,6 +282,7 @@ public class SemanticRepresentation {
             if (infoMatcher.find()) {
                 String infoValue = infoMatcher.group(1);
                 results.add(infoValue);
+                results.add(url.toString());
             }
         }
         return results;
@@ -261,4 +291,80 @@ public class SemanticRepresentation {
         return null;
     }
 }
+
+    private static List<String> getProductInfo2nd(String productUUID, List<String> infoNames) throws IOException {
+		String path = "/config/configuration.json";
+		BufferedReader bufferedReader;
+		JsonElement conf = null;
+
+		String username = "";
+		String password = "";
+		String baseURLNEW = "";
+		try {
+		    bufferedReader = new BufferedReader(new FileReader(path));
+		    Gson gson = new Gson();
+		    conf = gson.fromJson(bufferedReader, JsonElement.class);
+		    for (int i = 0; i <
+				conf.getAsJsonObject().get("sources").getAsJsonArray().size(); i++) {
+
+    			 if
+				 (conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject().has("type"))
+				{
+					 if(conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject().get("type").toString().replace("\"", "").equals("orbitPass"))
+       					{
+   						 	 JsonObject obj = new JsonObject();
+    					 	 obj = conf.getAsJsonObject().get("sources").getAsJsonArray().get(i).getAsJsonObject();
+    					 	 username = obj.get("username").toString();
+    					 	 password = obj.get("password").toString();
+    					 	 baseURLNEW = obj.get("dataSource").toString();
+        				}
+        		}
+        	}		 
+
+		} catch (FileNotFoundException e) {
+		    e.printStackTrace();
+		}
+					 
+    
+    URL url = new URL(baseURLNEW.replace("[productUUID]", productUUID.toString()).replace("\"", "").replace("colhub2", "colhub").replace("colhub3", "colhub"));
+    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    con.setRequestMethod("GET");
+    con.setRequestProperty("Content-Type", "application/json");
+
+    // Add authentication credentials to request
+    String authHelper = username.replace("\"","") + ":" + password.replace("\"","");
+    String encodedCredentials = Base64.getEncoder().encodeToString((authHelper).getBytes());
+    
+    con.setRequestProperty("Authorization", "Basic " + encodedCredentials);
+
+    int responseCode = con.getResponseCode();
+    if (responseCode == HttpURLConnection.HTTP_OK) {
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        List<String> results = new ArrayList<String>();
+        for (String infoName : infoNames) {
+            String infoPatternString = "\"name\":\"" + infoName + "\",\"content\":\"([^\"]+)\"";
+            Pattern infoPattern = Pattern.compile(infoPatternString);
+            Matcher infoMatcher = infoPattern.matcher(response.toString());
+            if (infoMatcher.find()) {
+                String infoValue = infoMatcher.group(1);
+                results.add(infoValue);
+                results.add(url.toString());
+            }
+        }
+        return results;
+    } else {
+        System.out.println("Error: " + responseCode);
+        return null;
+    }
+	}
+
+
+
 }

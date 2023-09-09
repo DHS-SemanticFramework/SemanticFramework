@@ -281,7 +281,6 @@ public class MyResource {
 			JsonObject jobject = json.getAsJsonObject();
 
 
-			//Some processing to get the input from Valadis
 			String inputText = "";
 			try{
 				JsonObject jobjectNLP = jobject.get("nlp").getAsJsonObject();
@@ -345,7 +344,7 @@ public class MyResource {
 				System.out.println("Current text: " + inputText);
 			}
 			catch (Exception e) {
-				System.out.println("Some error sry Alex");
+				System.out.println("The input from the NL could not be parsed");
 			}
 			//
 			//String input = jobject.get("text").getAsString();
@@ -539,6 +538,15 @@ public class MyResource {
 				}
 			else if (jobjectNLPerror.get("year").toString().replace("\"", "").equals("9999934")) {
 					response = "Unexpected error related to date reference input";
+					JsonObject error = new JsonObject();
+					error.addProperty("error", response);
+					logger.info("[Response code]: 200, [Response]: " + error + "\n");
+					fh.close();
+					return Response.status(200).entity(error.toString()).build();
+				}
+
+			if (jobjectNLPerror.get("city").toString().replace("\"", "").equals("9999945")) {
+					response = "City could not be recognized";
 					JsonObject error = new JsonObject();
 					error.addProperty("error", response);
 					logger.info("[Response code]: 200, [Response]: " + error + "\n");
@@ -2737,6 +2745,9 @@ public class MyResource {
 
 				if (!city.equals("null") && !country.equals("null")) {
 					// Calling location detection
+
+					System.out.println(city);
+					System.out.println(country);
 					String latLong = LocationDetection.retrieveLatLong(city, country, kb_address_retrieve, logger);
 
 					String[] locparts = latLong.split(":");
@@ -2890,13 +2901,8 @@ public class MyResource {
 			// Semantic representation and storage of location-related information (this
 			// procedure should be done only once on the initial setup of the framework)
 			String kb_address = System.getenv("KB_ADDRESS");
-			System.out.println("Hi Alex 0");
 			Model geoModel = ModelFactory.createDefaultModel();
-			System.out.println("Hi Alex 1");
 			geoModel = LocationDetection.preprocessing(logger);
-			System.out.println("Hi Alex 2");
-			System.out.println("The geo model: " + geoModel);
-			System.out.println("The geo repository: " + geoRepository);
 			SemanticRepresentation.storeModel(geoModel, kb_address, geoRepository);
 			JsonObject status = new JsonObject();
 			status.addProperty("status", "Successfully added to KB.");

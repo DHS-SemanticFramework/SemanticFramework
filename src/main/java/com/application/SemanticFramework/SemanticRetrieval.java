@@ -110,8 +110,8 @@ public class SemanticRetrieval {
 							+ "?e_event event:product ?product.\r\n" + "?product rdf:type event:Product. \r\n"
 							+ "?product event:source ?p_src.\r\n" + "?product time:inXSDDateTimeStamp ?p_timestamp.\r\n"
 							+ "?product event:place ?p_location.\r\n" + "?product event:hasId ?p_id.\r\n"
-							+ "?product event:hasOrbit ?orbit.\r\n" + "?product event:hasPassDirection ?pass.\r\n"
-							+ "?product event:productURL ?p_url.\r\n" + " FILTER (?e_event=<" + e_event + ">)\r\n"
+							+ "optional{?product event:hasOrbit ?orbit.}\r\n" + "optional{?product event:hasPassDirection ?pass.}\r\n"
+							+ "optional{?product event:productURL ?p_url.}\r\n" + " FILTER (?e_event=<" + e_event + ">)\r\n"
 							+ "FILTER (xsd:string(?p_src)=\"" + copernicusSources.get(i)
 							+ "\"^^<http://www.w3.org/2001/XMLSchema#string>)" +
 
@@ -154,8 +154,8 @@ public class SemanticRetrieval {
 							+ "?e_event event:product ?product.\r\n" + "?product rdf:type event:Product. \r\n"
 							+ "?product event:source ?p_src.\r\n" + "?product time:inXSDDateTimeStamp ?p_timestamp.\r\n"
 							+ "?product event:place ?p_location.\r\n" + "?product event:hasId ?p_id.\r\n"
-							+ "?product event:productURL ?p_url.\r\n" + " FILTER (?e_event=<" + e_event + ">)\r\n"
-							+ "?product event:hasOrbit ?orbit.\r\n" + "?product event:hasPassDirection ?pass.\r\n"
+							+ "optional{?product event:productURL ?p_url.}\r\n" + " FILTER (?e_event=<" + e_event + ">)\r\n"
+							+ "optional{?product event:hasOrbit ?orbit.}\r\n" + "optional{?product event:hasPassDirection ?pass.}\r\n"
 							
 							+ "FILTER (xsd:dateTime(?p_timestamp)<=xsd:dateTime(?e_timestamp))\r\n"
 							+ "FILTER (xsd:string(?p_src)=\"" + copernicusSources.get(i)

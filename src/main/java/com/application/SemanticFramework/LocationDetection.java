@@ -98,9 +98,12 @@ public class LocationDetection {
 				+ " FILTER (xsd:string(?city_lbl)=xsd:string(\"" + city + "\"))\r\n"
 				+ " FILTER (xsd:string(?country_lbl)=xsd:string(\"" + country + "\"))\r\n" + "} LIMIT 1\r\n";
 
+		System.out.println(query);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(service, query);
 		try {
+
 			ResultSet results = qe.execSelect();
+			System.out.println(results);
 			for (; results.hasNext();) {
 
 				QuerySolution soln = results.nextSolution();

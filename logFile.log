@@ -1,2 +1,5 @@
-
+May 13, 2023 11:09:21 AM com.application.SemanticFramework.MyResource retrieval
+SEVERE: Exception:java.net.SocketTimeoutException: connect timed out
+May 13, 2023 11:09:21 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [Response code]: 401, [Response]: {"error":"The user has no assigned 'Search' role."}
 

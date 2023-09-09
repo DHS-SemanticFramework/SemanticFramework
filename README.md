@@ -47,7 +47,7 @@ The user will be able to execute queries in natural language using the following
 
 ```
 {
-  "page": "1",
-  "nlp": {"event":"earthquake", "city":"Zagreb", "country": "Croatia", "year": 2020, "month": "null", "day": "null", "magnitude": "null", "comparative": "null", "point": false, "latitude": 0, "lognitude": 0}
-}
+  "text": "earthquake located in Zagreb, Croatia in 2020 with magnitude greater than 5.0" ,
+  "page": "1"
+} 
 ```

@@ -1,0 +1,9 @@
+{
+    "client_secret": "TEl0WF5c67ZOrPhLtuZKOPbQ3rcodZop",
+    "client_container_id": "2203bc2b-1495-4493-a3a2-251b819ce2c7",
+    "client_name": "sf-api",
+    "URL": "http://0.0.0.0:8081/",
+    "realm": "master",
+    "adminUsername":"user",
+    "adminPassword":"bitnami"
+}

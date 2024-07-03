@@ -153,6 +153,9 @@ public class SemanticRepresentation {
 				try{
 	        		List<String> infoNames = Arrays.asList("relativeorbitnumber", "orbitdirection");
 	        		List<String> results = getProductInfo(uuidOrbit, infoNames);
+					//System.out.println(results);
+					//System.out.println(result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL"));
+					//System.out.println(results);
 	        		System.out.println("The orbit number: " + results.get(0));
 					System.out.println("The pass direction: " + results.get(2));
 					System.out.println("The url: " + results.get(1));
@@ -174,6 +177,8 @@ public class SemanticRepresentation {
 					try{
 	        			List<String> infoNames = Arrays.asList("relativeorbitnumber", "orbitdirection");
 	        			List<String> results = getProductInfo2nd(uuidOrbit, infoNames);
+						//System.out.println(result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL"));
+						//System.out.println(results);
 	        			System.out.println("The orbit number: " + results.get(0));
 						System.out.println("The pass direction: " + results.get(2));
 						System.out.println("The url: " + results.get(1));
@@ -188,6 +193,14 @@ public class SemanticRepresentation {
 								results.get(2).toString());
 					} catch (Exception  e) {
 						System.out.println("Orbit and Pass Direction do not exist from this data source");
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "productURL"),
+								result.getJSONArray(copernicusSources.get(j)).getJSONObject(i).getString("productURL"));
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "source"),
+								copernicusSources.get(j));
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasOrbit"),
+								"0");
+						model.add(model.createResource(product_instance), model.createProperty(Prefixes.event + "hasPassDirection"),
+								"0");
 					}
 				}
 
@@ -254,6 +267,7 @@ public class SemanticRepresentation {
 					 
     
     URL url = new URL(baseURLNEW.replace("[productUUID]", productUUID.toString()).replace("\"", ""));
+	//System.out.println(baseURLNEW.replace("[productUUID]", productUUID.toString()).replace("\"", ""));
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
     con.setRequestProperty("Content-Type", "application/json");
@@ -327,6 +341,7 @@ public class SemanticRepresentation {
 					 
     
     URL url = new URL(baseURLNEW.replace("[productUUID]", productUUID.toString()).replace("\"", "").replace("colhub2", "colhub").replace("colhub3", "colhub"));
+	//System.out.println(baseURLNEW.replace("[productUUID]", productUUID.toString()).replace("\"", "").replace("colhub2", "colhub").replace("colhub3", "colhub"));
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setRequestMethod("GET");
     con.setRequestProperty("Content-Type", "application/json");

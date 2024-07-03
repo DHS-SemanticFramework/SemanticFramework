@@ -120,6 +120,7 @@ public class SemanticRetrieval {
 
 							//+ "ORDER BY ASC (?p_timestamp)\r\n" + "LIMIT 1\r\n" + "";
 					
+					
 					QueryExecution qe2 = QueryExecutionFactory.sparqlService(service, query);
 					try {
 						ResultSet results2 = qe2.execSelect();
@@ -197,26 +198,52 @@ public class SemanticRetrieval {
 								pass_after.get(time).toString().replace("\"", "").equals(pass_before.get(time).toString().replace("\"", ""))){
 								JsonParser jsonParser = new JsonParser();
 
-								JsonObject before = new JsonObject();
-								JsonObject after = new JsonObject();
-								int helperTime = time + 1;
-								String keybefore = "images_before" + helperTime;
-								String keyafter = "image_after" + helperTime;
-								before.addProperty("link", images_before.get(time).toString().replace("\"", ""));
-								after.addProperty("link", images_after.get(time).toString().replace("\"", ""));
-								before.addProperty("sensing_date", timestamp_before.get(time).toString().replace("\"", ""));
-								after.addProperty("sensing_date", timestamp_after.get(time).toString().replace("\"", ""));
-								before.addProperty("location", location_before.get(time).toString().replace("\"", ""));
-								after.addProperty("location", location_after.get(time).toString().replace("\"", ""));
-								before.addProperty("orbit_number", orbit_before.get(time).toString().replace("\"", ""));
-								after.addProperty("orbit_number", orbit_after.get(time).toString().replace("\"", ""));
-								before.addProperty("pass_direction", pass_before.get(time).toString().replace("\"", ""));
-								after.addProperty("pass_direction", pass_after.get(time).toString().replace("\"", ""));
+								if (images_before.get(time).toString().replace("\"", "").contains("onda-dias")){
+									JsonObject before = new JsonObject();
+									JsonObject after = new JsonObject();
+									int helperTime = time + 1;
+									String keybefore = "images_before" + helperTime;
+									String keyafter = "image_after" + helperTime;
+									before.addProperty("link", images_before.get(time).toString().replace("\"", ""));
+									after.addProperty("link", images_after.get(time).toString().replace("\"", ""));
+									before.addProperty("sensing_date", timestamp_before.get(time).toString().replace("\"", ""));
+									after.addProperty("sensing_date", timestamp_after.get(time).toString().replace("\"", ""));
+									before.addProperty("location", location_before.get(time).toString().replace("\"", ""));
+									after.addProperty("location", location_after.get(time).toString().replace("\"", ""));
+									//before.addProperty("orbit_number", orbit_before.get(time).toString().replace("\"", ""));
+									//after.addProperty("orbit_number", orbit_after.get(time).toString().replace("\"", ""));
+									//before.addProperty("pass_direction", pass_before.get(time).toString().replace("\"", ""));
+									//after.addProperty("pass_direction", pass_after.get(time).toString().replace("\"", ""));
 
-								event.add(keybefore, before);
-								event.add(keyafter, after);
+									event.add(keybefore, before);
+									event.add(keyafter, after);
 
-								pairs_time.add("before: " + images_before.get(time).toString().replace("\"", "") + " after:" + images_after.get(time).toString().replace("\"", ""));
+									pairs_time.add("before: " + images_before.get(time).toString().replace("\"", "") + " after:" + images_after.get(time).toString().replace("\"", ""));
+								}else
+								{
+									JsonObject before = new JsonObject();
+									JsonObject after = new JsonObject();
+									int helperTime = time + 1;
+									String keybefore = "images_before" + helperTime;
+									String keyafter = "image_after" + helperTime;
+									before.addProperty("link", images_before.get(time).toString().replace("\"", ""));
+									after.addProperty("link", images_after.get(time).toString().replace("\"", ""));
+									before.addProperty("sensing_date", timestamp_before.get(time).toString().replace("\"", ""));
+									after.addProperty("sensing_date", timestamp_after.get(time).toString().replace("\"", ""));
+									before.addProperty("location", location_before.get(time).toString().replace("\"", ""));
+									after.addProperty("location", location_after.get(time).toString().replace("\"", ""));
+									before.addProperty("orbit_number", orbit_before.get(time).toString().replace("\"", ""));
+									after.addProperty("orbit_number", orbit_after.get(time).toString().replace("\"", ""));
+									before.addProperty("pass_direction", pass_before.get(time).toString().replace("\"", ""));
+									after.addProperty("pass_direction", pass_after.get(time).toString().replace("\"", ""));
+
+									event.add(keybefore, before);
+									event.add(keyafter, after);
+
+									pairs_time.add("before: " + images_before.get(time).toString().replace("\"", "") + " after:" + images_after.get(time).toString().replace("\"", ""));
+								}
+
+
 							}
 						}
 					} catch (Exception e) {
@@ -242,6 +269,7 @@ public class SemanticRetrieval {
 				event.addProperty("timestamp", timestamp);
 
 				events.add(event);
+				System.out.println(event);
 				event = new JsonObject();
 			}
 		} catch (Exception e) {

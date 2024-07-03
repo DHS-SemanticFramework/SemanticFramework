@@ -3,3 +3,9 @@ SEVERE: Exception:java.net.SocketTimeoutException: connect timed out
 May 13, 2023 11:09:21 AM com.application.SemanticFramework.MyResource retrieval
 INFO: [Response code]: 401, [Response]: {"error":"The user has no assigned 'Search' role."}
 
+May 23, 2024 8:44:10 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [Response]: {"error_description":"Invalid client credentials","error":"invalid_client"}
+
+May 23, 2024 8:44:10 AM com.application.SemanticFramework.MyResource retrieval
+INFO: [Response code]: 200, [Response]: {"error":"Invalid client credentials."}
+

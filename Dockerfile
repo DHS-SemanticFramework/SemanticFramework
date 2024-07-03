@@ -12,6 +12,7 @@ ADD server.xml /code/server.xml
 # Prepare by downloading dependencies
 ADD /libs/virt_jena3.jar /code/virt_jena3.jar
 ADD /libs/virtjdbc4.jar /code/virtjdbc4.jar
+ADD /libs/xstream-1.4.20.jar /code/xstream-1.4.20.jar
 
 ENV KB_ADDRESS default_env_value
 

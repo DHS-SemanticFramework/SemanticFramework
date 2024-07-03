@@ -290,3 +290,82 @@
 11:12:35 Checkpoint started
 11:12:35 Checkpoint finished, log reused
 11:12:35 Server shutdown complete
+
+		Mon Apr 29 2024
+11:21:59 { Loading plugin 1: Type `plain', file `geos' in `../hosting'
+11:21:59   plain version 1.2.3239 from OpenLink Software
+11:21:59   GEOS plugin based on Geometry Engine Open Source library from Open Source Geospatial Foundation
+11:21:59   SUCCESS plugin 1: loaded from ../hosting/geos.so }
+11:21:59 { Loading plugin 2: Type `plain', file `graphql' in `../hosting'
+11:21:59   GraphQL/SPARQL Bridge version 0.9.3 (d698f2171) from OpenLink Software
+11:21:59   Support functions for GraphQL/SPARQL Bridge
+11:21:59   SUCCESS plugin 2: loaded from ../hosting/graphql.so }
+11:21:59 { Loading plugin 3: Type `plain', file `proj4' in `../hosting'
+11:21:59   plain version 1.1.3239 from OpenLink Software
+11:21:59   Cartographic Projections support based on Frank Warmerdam's proj4 library
+11:21:59   SUCCESS plugin 3: loaded from ../hosting/proj4.so }
+11:21:59 { Loading plugin 4: Type `plain', file `shapefileio' in `../hosting'
+11:21:59   ShapefileIO version 0.1virt71 from OpenLink Software
+11:21:59   Shapefile support based on Frank Warmerdam's Shapelib
+11:21:59   SUCCESS plugin 4: loaded from ../hosting/shapefileio.so }
+11:21:59 OpenLink Virtuoso Universal Server
+11:21:59 Version 07.20.3239-pthreads for Linux as of Feb 13 2024 (d698f2171)
+11:21:59 uses OpenSSL 1.1.1  11 Sep 2018
+11:21:59 uses parts of PCRE, Html Tidy
+11:21:59 Database version 3126
+11:21:59 SQL Optimizer enabled (max 1000 layouts)
+11:22:00 Compiler unit is timed at 0.000186 msec
+11:22:05 Roll forward started
+11:22:05 Roll forward complete
+11:22:06 PL LOG: Installing Virtuoso Conductor version 1.00.8863 (DAV)
+11:22:06 PL LOG: Installing with dependencies Virtuoso Conductor version 1.00.8863/2024-02-13 16:34 (DAV)
+11:22:06 Checkpoint started
+11:22:06 Checkpoint finished, log reused
+11:22:16 Checkpoint started
+11:22:16 Checkpoint finished, log reused
+11:22:16 PL LOG: Installation with dependencies complete
+11:22:17 Checkpoint started
+11:22:17 Checkpoint finished, log reused
+11:22:19 HTTP/WebDAV server online at 8890
+11:22:19 Server online at 1111 (pid 1)
+11:23:38 Server received signal 2
+11:23:38 Initiating normal shutdown
+11:23:38 Checkpoint started
+11:23:40 Checkpoint finished, log reused
+11:23:41 Server shutdown complete
+
+		Thu May 23 2024
+08:43:26 { Loading plugin 1: Type `plain', file `geos' in `../hosting'
+08:43:27   plain version 1.2.3239 from OpenLink Software
+08:43:27   GEOS plugin based on Geometry Engine Open Source library from Open Source Geospatial Foundation
+08:43:27   SUCCESS plugin 1: loaded from ../hosting/geos.so }
+08:43:27 { Loading plugin 2: Type `plain', file `graphql' in `../hosting'
+08:43:27   GraphQL/SPARQL Bridge version 0.9.3 (d698f2171) from OpenLink Software
+08:43:27   Support functions for GraphQL/SPARQL Bridge
+08:43:27   SUCCESS plugin 2: loaded from ../hosting/graphql.so }
+08:43:27 { Loading plugin 3: Type `plain', file `proj4' in `../hosting'
+08:43:27   plain version 1.1.3239 from OpenLink Software
+08:43:27   Cartographic Projections support based on Frank Warmerdam's proj4 library
+08:43:27   SUCCESS plugin 3: loaded from ../hosting/proj4.so }
+08:43:27 { Loading plugin 4: Type `plain', file `shapefileio' in `../hosting'
+08:43:27   ShapefileIO version 0.1virt71 from OpenLink Software
+08:43:27   Shapefile support based on Frank Warmerdam's Shapelib
+08:43:27   SUCCESS plugin 4: loaded from ../hosting/shapefileio.so }
+08:43:27 OpenLink Virtuoso Universal Server
+08:43:27 Version 07.20.3239-pthreads for Linux as of Feb 13 2024 (d698f2171)
+08:43:27 uses OpenSSL 1.1.1  11 Sep 2018
+08:43:27 uses parts of PCRE, Html Tidy
+08:43:27 Database version 3126
+08:43:27 SQL Optimizer enabled (max 1000 layouts)
+08:43:28 Compiler unit is timed at 0.000121 msec
+08:43:30 Roll forward started
+08:43:30 Roll forward complete
+08:43:31 Checkpoint started
+08:43:32 Checkpoint finished, log reused
+08:43:34 HTTP/WebDAV server online at 8890
+08:43:34 Server online at 1111 (pid 1)
+08:44:40 Server received signal 2
+08:44:40 Initiating normal shutdown
+08:44:41 Checkpoint started
+08:44:41 Checkpoint finished, log reused
+08:44:41 Server shutdown complete
